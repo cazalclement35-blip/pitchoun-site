@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Page introuvable — Pitchoun'</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,800&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --sage-dk:#4A7048;--sage-lt:#C8DEC7;--sage:#8BAF8A;
+      --cream:#FAF6EF;--coral:#E8836A;--muted:#6B7F6A;--white:#FFFFFF;
+      --font-display:'Fraunces',Georgia,serif;
+      --font-body:'DM Sans',system-ui,sans-serif;
+    }
+    body{background:var(--cream);font-family:var(--font-body);min-height:100vh;display:flex;flex-direction:column}
+    nav{height:62px;background:rgba(250,246,239,.97);border-bottom:1px solid var(--sage-lt);display:flex;align-items:center;padding:0 2.5rem}
+    .nav-logo{font-family:var(--font-display);font-weight:800;font-size:1.5rem;color:var(--sage-dk);text-decoration:none;letter-spacing:-.02em}
+    .nav-logo span{color:var(--coral)}
+    main{flex:1;display:flex;align-items:center;justify-content:center}
+    .btn{display:inline-block;background:var(--sage-dk);color:var(--white);padding:.9rem 2.2rem;border-radius:100px;text-decoration:none;font-weight:600;font-size:1rem;transition:background .2s,transform .15s}
+    .btn:hover{background:var(--sage);transform:translateY(-2px)}
+    footer{background:var(--sage-lt);color:var(--muted);padding:2.5rem 8%;display:flex;justify-content:space-between;align-items:center;gap:2rem;flex-wrap:wrap;border-top:1px solid var(--sage)}
+    .footer-logo{font-family:var(--font-display);font-weight:800;font-size:1.2rem;color:var(--sage-dk)}
+    .footer-logo span{color:var(--coral)}
+    footer p{font-size:.83rem}
+    footer a{color:var(--muted);text-decoration:none;font-size:.83rem;transition:color .2s}
+    footer a:hover{color:var(--sage-dk)}
+    .footer-links{display:flex;gap:1.8rem}
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">Pitchoun<span>'</span></a>
+  </nav>
+  <main>
+    <a href="index.html" class="btn">← Retour à l'accueil</a>
+  </main>
+  <footer>
+    <div class="footer-logo">Pitchoun<span>'</span></div>
+    <p>Association loi 1901 · Bordeaux · Fondée en 1986</p>
+    <div class="footer-links">
+      <a href="#">Mentions légales & RGPD</a>
+      <a href="#">Facebook</a>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pitchoun' — Crèches associatives à Bordeaux</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,800;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --sage:#8BAF8A;--sage-lt:#C8DEC7;--sage-dk:#4A7048;
+      --cream:#FAF6EF;--sun:#F2C063;--coral:#E8836A;
+      --ink:#1C2B1A;--muted:#6B7F6A;--white:#FFFFFF;
+      --font-display:'Fraunces',Georgia,serif;
+      --font-body:'DM Sans',system-ui,sans-serif;
+      --nav-h:62px;
+    }
+    html{scroll-behavior:smooth}
+    body{background:var(--cream);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.65;overflow-x:hidden}
+
+    /* ══ NAV ══ */
+    nav{
+      position:fixed;top:0;left:0;right:0;z-index:200;
+      height:var(--nav-h);
+      background:rgba(250,246,239,.97);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--sage-lt);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 2.5rem;
+    }
+    .nav-logo{
+      font-family:var(--font-display);font-weight:800;font-size:1.5rem;
+      color:var(--sage-dk);text-decoration:none;letter-spacing:-.02em;
+      cursor:pointer;border:none;background:none;
+    }
+    .nav-logo span{color:var(--coral)}
+
+    /* Burger */
+    .burger{
+      background:none;border:none;cursor:pointer;
+      padding:.5rem;display:flex;flex-direction:column;
+      gap:5px;align-items:flex-end;
+    }
+    .burger-bar{
+      height:2.5px;border-radius:2px;background:var(--sage-dk);
+      transition:width .25s,transform .3s,opacity .2s;
+      transform-origin:right center;
+    }
+    .burger-bar:nth-child(1){width:24px}
+    .burger-bar:nth-child(2){width:18px}
+    .burger-bar:nth-child(3){width:12px}
+    /* Ouvert : croix */
+    .burger.open .burger-bar:nth-child(1){width:22px;transform:translateY(7.5px) rotate(-45deg)}
+    .burger.open .burger-bar:nth-child(2){opacity:0;width:0}
+    .burger.open .burger-bar:nth-child(3){width:22px;transform:translateY(-7.5px) rotate(45deg)}
+
+    /* ══ DRAWER MENU ══ */
+    .drawer-overlay{
+      position:fixed;inset:0;z-index:150;
+      background:transparent;
+      pointer-events:none;
+      transition:background .3s;
+    }
+    .drawer-overlay.open{
+      background:rgba(28,43,26,.45);
+      pointer-events:all;
+    }
+    .drawer{
+      position:fixed;top:0;right:0;bottom:0;z-index:160;
+      width:300px;
+      background:var(--white);
+      border-left:1px solid var(--sage-lt);
+      box-shadow:-8px 0 40px rgba(28,43,26,.12);
+      display:flex;flex-direction:column;
+      transform:translateX(100%);
+      transition:transform .35s cubic-bezier(.4,0,.2,1);
+      padding:var(--nav-h) 0 2rem;
+    }
+    .drawer.open{transform:translateX(0)}
+
+    /* Pages du menu */
+    .drawer-pages{
+      padding:2rem 0 1.5rem;
+      border-bottom:1px solid var(--sage-lt);
+    }
+    .drawer-page-btn{
+      width:100%;background:none;border:none;cursor:pointer;
+      font-family:var(--font-body);text-align:left;
+      display:flex;align-items:center;gap:1rem;
+      padding:.9rem 2rem;
+      transition:background .15s;
+      position:relative;
+    }
+    .drawer-page-btn:hover{background:var(--cream)}
+    .drawer-page-btn.active{background:rgba(139,175,138,.1)}
+    .drawer-page-btn.active::before{
+      content:'';position:absolute;left:0;top:20%;bottom:20%;
+      width:3px;border-radius:0 2px 2px 0;
+      background:var(--sage-dk);
+    }
+
+    /* Mini burger dans le drawer */
+    .dpb-bars{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+    .dpb-bar{height:2px;border-radius:2px;background:var(--muted);transition:background .15s}
+    .drawer-page-btn.active .dpb-bar{background:var(--sage-dk)}
+    .drawer-page-btn:nth-child(1) .dpb-bar:nth-child(1){width:20px}
+    .drawer-page-btn:nth-child(1) .dpb-bar:nth-child(2){width:14px}
+    .drawer-page-btn:nth-child(1) .dpb-bar:nth-child(3){width:9px}
+    .drawer-page-btn:nth-child(2) .dpb-bar:nth-child(1){width:20px}
+    .drawer-page-btn:nth-child(2) .dpb-bar:nth-child(2){width:20px}
+    .drawer-page-btn:nth-child(2) .dpb-bar:nth-child(3){width:13px}
+    .drawer-page-btn:nth-child(3) .dpb-bar:nth-child(1){width:13px}
+    .drawer-page-btn:nth-child(3) .dpb-bar:nth-child(2){width:20px}
+    .drawer-page-btn:nth-child(3) .dpb-bar:nth-child(3){width:20px}
+
+    .dpb-info{}
+    .dpb-label{font-weight:700;font-size:.95rem;color:var(--ink);display:block}
+    .drawer-page-btn.active .dpb-label{color:var(--sage-dk)}
+    .dpb-sub{font-size:.75rem;color:var(--muted);display:block;margin-top:.1rem}
+
+    /* Dot notif */
+    .dpb-dot{
+      width:8px;height:8px;border-radius:50%;
+      background:var(--coral);margin-left:auto;flex-shrink:0;
+      display:none;
+    }
+    .has-notif .dpb-dot{display:block}
+
+    /* Ancres */
+    .drawer-anchors{
+      padding:1.2rem 0;
+      border-bottom:1px solid var(--sage-lt);
+    }
+    .drawer-anchor{
+      display:block;padding:.6rem 2rem;
+      color:var(--muted);text-decoration:none;
+      font-size:.88rem;font-weight:500;
+      transition:color .15s,background .15s;
+    }
+    .drawer-anchor:hover{color:var(--sage-dk);background:var(--cream)}
+
+    /* Contact */
+    .drawer-contact{
+      padding:1.5rem 2rem 0;margin-top:auto;
+    }
+    .drawer-contact a{
+      display:inline-flex;align-items:center;gap:.6rem;
+      background:var(--coral);color:var(--white);
+      padding:.75rem 1.5rem;border-radius:100px;
+      text-decoration:none;font-weight:600;font-size:.88rem;
+      transition:background .2s;
+    }
+    .drawer-contact a:hover{background:#d46d52}
+
+    /* ══ PAGES ══ */
+    .page{display:none}
+    .page.active{display:block}
+
+    /* ══ HERO ══ */
+    .hero{
+      min-height:100vh;
+      display:grid;grid-template-columns:1fr 1fr;
+      align-items:stretch;overflow:hidden;
+      padding-top:var(--nav-h);
+    }
+    .hero-text{background:var(--cream);padding:5rem 4rem 5rem 8%;display:flex;flex-direction:column;justify-content:center}
+    .eyebrow{display:inline-block;font-size:.78rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--sage-dk);background:var(--sage-lt);border:1px solid var(--sage);padding:.35rem .9rem;border-radius:100px;margin-bottom:1.6rem}
+    .hero h1{font-family:var(--font-display);font-size:clamp(2.4rem,4vw,4rem);font-weight:800;line-height:1.08;letter-spacing:-.03em;margin-bottom:1.5rem;color:var(--sage-dk)}
+    .hero h1 em{font-style:italic;font-weight:300;color:var(--sage)}
+    .hero-sub{font-size:1rem;color:var(--muted);max-width:420px;margin-bottom:2.4rem;font-weight:300;line-height:1.75}
+    .hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+    .btn-primary{background:var(--sage-dk);color:var(--white);padding:.85rem 1.9rem;border-radius:100px;text-decoration:none;font-weight:600;font-size:.92rem;transition:background .2s,transform .15s}
+    .btn-primary:hover{background:var(--sage);transform:translateY(-2px)}
+    .btn-outline{background:transparent;color:var(--sage-dk);padding:.85rem 1.9rem;border-radius:100px;border:1.5px solid var(--sage-dk);text-decoration:none;font-weight:500;font-size:.92rem;transition:all .2s}
+    .btn-outline:hover{border-color:var(--sage);color:var(--sage);background:rgba(139,175,138,.08);transform:translateY(-2px)}
+    .hero-visual{position:relative;display:flex;align-items:center;justify-content:center;background:var(--cream)}
+    .blob-bg{position:absolute;inset:0;overflow:hidden}
+    .blob-bg svg{width:100%;height:100%;object-fit:cover}
+    .hero-stats{position:relative;z-index:2;display:flex;flex-direction:column;gap:1.2rem}
+    .stat-card{background:var(--white);border:1.5px solid var(--sage-lt);border-radius:1.2rem;padding:1.3rem 1.6rem;box-shadow:0 6px 28px rgba(28,43,26,.1);animation:floatA 6s ease-in-out infinite}
+    .stat-card:nth-child(2){animation-name:floatB;margin-left:2rem}
+    .stat-card:nth-child(3){animation-delay:-3s}
+    @keyframes floatA{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    @keyframes floatB{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+    .stat-num{font-family:var(--font-display);font-size:2.2rem;font-weight:800;color:var(--sage-dk);line-height:1}
+    .stat-label{font-size:.8rem;color:var(--muted);margin-top:.2rem}
+
+    /* ══ SECTIONS ══ */
+    section{padding:6rem 8%}
+    .section-label{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--sage-dk);font-weight:500;margin-bottom:.8rem}
+    .section-title{font-family:var(--font-display);font-size:clamp(1.9rem,3vw,2.8rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:1.2rem}
+    .section-title em{font-style:italic;font-weight:300;color:var(--sage-dk)}
+
+    .mission{background:var(--sage-lt)}
+    .mission .section-title,.mission .section-label{color:var(--sage-dk)}
+    .mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+    .mission-body{font-size:1rem;color:var(--muted);line-height:1.8}
+    .mission-body p+p{margin-top:1rem}
+    .mission-pillars{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+    .pillar{background:var(--white);border:1px solid var(--sage-lt);border-radius:1rem;padding:1.5rem;transition:background .2s,box-shadow .2s}
+    .pillar:hover{background:var(--cream);box-shadow:0 4px 16px rgba(74,112,72,.1)}
+    .pillar-icon{font-size:1.7rem;margin-bottom:.7rem}
+    .pillar h3{font-family:var(--font-display);font-size:1rem;font-weight:600;color:var(--sage-dk);margin-bottom:.3rem}
+    .pillar p{font-size:.86rem;color:var(--muted);line-height:1.6}
+
+    #creches{background:var(--sage-dk)}
+    .creches-intro{max-width:540px;margin-bottom:3rem}
+    .creches-intro .section-label{color:var(--cream)}
+    .creches-intro h2{color:var(--cream)}
+    .creches-intro h2 em{color:var(--sun)}
+    .creches-intro p{color:var(--cream);margin-top:.8rem;font-size:.95rem;opacity:.85}
+    .creches-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.4rem}
+    .creche-card{background:var(--white);border-radius:1.4rem;overflow:hidden;border:1px solid var(--sage-lt);transition:transform .25s,box-shadow .25s}
+    .creche-card:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(28,43,26,.12)}
+    .creche-color-bar{height:5px;background:var(--sage)}
+    .creche-card:nth-child(2) .creche-color-bar{background:var(--coral)}
+    .creche-card:nth-child(3) .creche-color-bar{background:var(--sun)}
+    .creche-card:nth-child(4) .creche-color-bar{background:var(--sage-dk)}
+    .creche-card:nth-child(5) .creche-color-bar{background:#A889C9}
+    .creche-body{padding:1.5rem}
+    .creche-name{font-family:var(--font-display);font-size:1.2rem;font-weight:700;margin-bottom:.2rem}
+    .creche-address{font-size:.82rem;color:var(--muted);margin-bottom:.9rem}
+    .creche-meta{display:flex;gap:.5rem;flex-wrap:wrap}
+    .badge{background:var(--cream);border:1px solid var(--sage-lt);border-radius:100px;padding:.25rem .65rem;font-size:.76rem;color:var(--muted);font-weight:500}
+    .creche-contact{margin-top:1.1rem;padding-top:1.1rem;border-top:1px solid var(--sage-lt);font-size:.82rem;color:var(--sage-dk);font-weight:500}
+
+    .inscription{background:var(--white)}
+    .inscription-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+    .inscription-steps{display:flex;flex-direction:column;gap:1.5rem}
+    .step{display:grid;grid-template-columns:46px 1fr;gap:1.1rem;align-items:start}
+    .step-num{width:46px;height:46px;border-radius:50%;background:var(--sage-lt);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:1.05rem;color:var(--sage-dk);flex-shrink:0}
+    .step h3{font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:.3rem}
+    .step p{font-size:.88rem;color:var(--muted);line-height:1.6}
+    .inscription-aside{background:var(--cream);border-radius:1.5rem;padding:2.2rem;border:1px solid var(--sage-lt)}
+    .aside-title{font-family:var(--font-display);font-weight:700;font-size:1.15rem;margin-bottom:1.1rem}
+    .aside-item{display:flex;gap:.8rem;align-items:flex-start;padding:.75rem 0;border-top:1px solid var(--sage-lt);font-size:.88rem;color:var(--muted)}
+    .aside-item:first-of-type{border-top:none}
+
+    .eco{background:var(--cream)}
+    .eco-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:2.8rem}
+    .eco-card{background:var(--white);border:1.5px solid var(--sage-lt);border-radius:1.2rem;padding:1.8rem;transition:box-shadow .2s,transform .2s}
+    .eco-card:hover{box-shadow:0 8px 28px rgba(74,112,72,.12);transform:translateY(-3px)}
+    .eco-card-icon{font-size:1.9rem;margin-bottom:.9rem}
+    .eco-card h3{font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--sage-dk);margin-bottom:.45rem}
+    .eco-card p{font-size:.87rem;color:var(--muted);line-height:1.65}
+
+    .contact{background:var(--cream)}
+    .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
+    .contact-info h3{font-family:var(--font-display);font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:.78rem;margin-bottom:.7rem;margin-top:1.4rem}
+    .contact-info h3:first-child{margin-top:0}
+    .contact-info p,.contact-info a{font-size:.93rem;color:var(--ink);text-decoration:none;transition:color .2s}
+    .contact-info a:hover{color:var(--sage-dk)}
+    .contact-form{display:flex;flex-direction:column;gap:.9rem}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+    .field{display:flex;flex-direction:column;gap:.35rem}
+    label{font-size:.8rem;font-weight:500;color:var(--muted)}
+    input,textarea,select{background:var(--white);border:1.5px solid var(--sage-lt);border-radius:.7rem;padding:.75rem .95rem;font-family:var(--font-body);font-size:.92rem;color:var(--ink);outline:none;transition:border-color .2s;width:100%}
+    input:focus,textarea:focus,select:focus{border-color:var(--sage-dk)}
+    textarea{resize:vertical;min-height:110px}
+    .btn-submit{background:var(--coral);color:var(--white);border:none;padding:.9rem 2rem;border-radius:100px;font-family:var(--font-body);font-size:.92rem;font-weight:600;cursor:pointer;align-self:flex-start;transition:background .2s,transform .15s}
+    .btn-submit:hover{background:#d46d52;transform:translateY(-2px)}
+
+    /* ══ PAGE BLOG ══ */
+    #page-blog,#page-recrutement{padding-top:var(--nav-h)}
+    .blog-hero{background:var(--sage-dk);padding:4.5rem 8% 3.5rem;position:relative;overflow:hidden}
+    .blog-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(242,192,99,.18) 0%,transparent 65%),radial-gradient(ellipse at 10% 80%,rgba(200,222,199,.12) 0%,transparent 60%)}
+    .blog-hero-inner{position:relative;z-index:1;max-width:580px}
+    .blog-eyebrow{display:inline-block;font-size:.75rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--sun);background:rgba(242,192,99,.15);border:1px solid rgba(242,192,99,.35);padding:.33rem .9rem;border-radius:100px;margin-bottom:1.1rem}
+    .blog-hero h1{font-family:var(--font-display);font-size:clamp(2rem,3.5vw,3.2rem);font-weight:800;line-height:1.08;letter-spacing:-.03em;color:var(--white);margin-bottom:.8rem}
+    .blog-hero h1 em{font-style:italic;font-weight:300;color:var(--sage-lt)}
+    .blog-hero p{color:rgba(255,255,255,.7);font-size:.97rem;max-width:440px;font-weight:300;line-height:1.7}
+
+    .blog-filters{background:var(--white);border-bottom:1.5px solid var(--sage-lt);padding:.55rem 8%;display:flex;gap:.4rem;flex-wrap:wrap;position:sticky;top:var(--nav-h);z-index:50}
+    .bfb{background:none;border:1.5px solid transparent;border-radius:.6rem;padding:.4rem .95rem;font-family:var(--font-body);font-size:.82rem;font-weight:500;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:.38rem;transition:background .15s,color .15s,border-color .15s}
+    .bfb:hover{background:var(--cream);color:var(--ink)}
+    .bfb.active{background:var(--sage-dk);color:var(--white);border-color:var(--sage-dk);font-weight:700}
+    .bfb-c{font-size:.63rem;background:rgba(255,255,255,.22);padding:.04rem .4rem;border-radius:100px;line-height:1.5}
+    .bfb:not(.active) .bfb-c{background:var(--sage-lt);color:var(--sage-dk)}
+
+    .blog-content{padding:2.5rem 8% 5rem}
+    .blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3rem}
+    .post-featured{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;background:var(--white);border-radius:1.4rem;overflow:hidden;border:1.5px solid var(--sage-lt);box-shadow:0 6px 32px rgba(74,112,72,.08);cursor:pointer;transition:transform .22s,box-shadow .22s}
+    .post-featured:hover{transform:translateY(-4px);box-shadow:0 14px 48px rgba(74,112,72,.13)}
+    .pf-visual{min-height:270px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:var(--sage-lt);font-size:5rem}
+    .pf-visual img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .pf-body{padding:2.2rem;display:flex;flex-direction:column;justify-content:center}
+    .pf-body h2{font-family:var(--font-display);font-size:1.55rem;font-weight:800;line-height:1.1;letter-spacing:-.02em;color:var(--ink);margin:.6rem 0 .75rem}
+    .pf-body p{color:var(--muted);font-size:.9rem;line-height:1.7;margin-bottom:1.1rem;flex:1}
+    .post-card{background:var(--white);border:1.5px solid var(--sage-lt);border-radius:1.2rem;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:transform .22s,box-shadow .22s}
+    .post-card:hover{transform:translateY(-5px);box-shadow:0 10px 36px rgba(28,43,26,.1)}
+    .pc-visual{height:155px;background:var(--sage-lt);display:flex;align-items:center;justify-content:center;font-size:3rem;overflow:hidden;position:relative;flex-shrink:0}
+    .pc-visual img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .pc-body{padding:1.2rem;flex:1;display:flex;flex-direction:column}
+    .pc-body h3{font-family:var(--font-display);font-size:1rem;font-weight:700;line-height:1.2;color:var(--ink);margin:.45rem 0 .38rem}
+    .pc-body p{font-size:.81rem;color:var(--muted);line-height:1.65;flex:1}
+    .pc-footer{display:flex;align-items:center;justify-content:space-between;margin-top:.9rem;padding-top:.85rem;border-top:1px solid var(--sage-lt);gap:.4rem;flex-wrap:wrap}
+    .pc-date{font-size:.73rem;color:var(--muted)}
+    .pc-tag{font-size:.7rem;color:var(--sage-dk);font-weight:600;background:var(--sage-lt);padding:.18rem .52rem;border-radius:100px}
+    .mini-gal{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;position:absolute;inset:0}
+    .mini-gal-item{overflow:hidden;position:relative}
+    .mini-gal-item img{width:100%;height:100%;object-fit:cover;display:block}
+    .mini-gal-more{position:absolute;inset:0;background:rgba(28,43,26,.65);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.82rem;font-weight:700}
+    .menu-prev{background:var(--cream);border-radius:.6rem;padding:.68rem .85rem;margin-top:.55rem;font-size:.76rem;color:var(--muted);line-height:1.75;border:1px solid var(--sage-lt);white-space:pre-line}
+    .pill{display:inline-flex;align-items:center;gap:.3rem;font-size:.68rem;font-weight:700;padding:.2rem .58rem;border-radius:100px;letter-spacing:.02em}
+    .pill-evenement{background:#FDF0EC;color:#C86B4A}
+    .pill-sortie{background:#EDF4ED;color:#4A7048}
+    .pill-menu{background:#FFF9E6;color:#856404}
+    .pill-photo{background:#F3EFFA;color:#5a3e8a}
+    .pill-actu{background:#E8F4F8;color:#0c5460}
+    .blog-empty{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--muted)}
+    .blog-empty-icon{font-size:2.8rem;margin-bottom:.8rem}
+
+    /* ══ PAGE RECRUTEMENT ══ */
+    .recr-hero{background:var(--ink);padding:4.5rem 8% 3.5rem;position:relative;overflow:hidden}
+    .recr-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 60%,rgba(139,175,138,.2) 0%,transparent 55%),radial-gradient(ellipse at 85% 20%,rgba(242,192,99,.12) 0%,transparent 50%)}
+    .recr-hero-inner{position:relative;z-index:1;max-width:580px}
+    .recr-eyebrow{display:inline-block;font-size:.75rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--sage-lt);background:rgba(139,175,138,.15);border:1px solid rgba(139,175,138,.3);padding:.33rem .9rem;border-radius:100px;margin-bottom:1.1rem}
+    .recr-hero h1{font-family:var(--font-display);font-size:clamp(2rem,3.5vw,3.2rem);font-weight:800;line-height:1.08;letter-spacing:-.03em;color:var(--white);margin-bottom:.8rem}
+    .recr-hero h1 em{font-style:italic;font-weight:300;color:var(--sage-lt)}
+    .recr-hero p{color:rgba(255,255,255,.65);font-size:.97rem;max-width:440px;font-weight:300;line-height:1.7}
+    .recr-valeurs{background:var(--sage-lt);padding:4rem 8%}
+    .recr-valeurs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.2rem;margin-top:2rem}
+    .valeur-card{background:var(--white);border:1px solid var(--sage-lt);border-radius:1rem;padding:1.5rem;display:flex;gap:.9rem;align-items:flex-start;transition:box-shadow .2s,transform .2s}
+    .valeur-card:hover{box-shadow:0 6px 22px rgba(74,112,72,.1);transform:translateY(-2px)}
+    .valeur-icon{width:40px;height:40px;border-radius:50%;background:var(--sage-lt);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .valeur-text strong{display:block;font-weight:700;font-size:.95rem;color:var(--ink);margin-bottom:.2rem;font-family:var(--font-display)}
+    .valeur-text span{font-size:.85rem;color:var(--muted);line-height:1.5}
+    .recr-offres{background:var(--cream);padding:4rem 8%}
+    .recr-offres-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:2rem}
+    .offre-card{background:var(--white);border:1.5px solid var(--sage-lt);border-radius:1.2rem;padding:1.5rem;transition:border-color .2s,box-shadow .2s,transform .2s}
+    .offre-card:hover{border-color:var(--sage);box-shadow:0 8px 28px rgba(28,43,26,.1);transform:translateY(-3px)}
+    .offre-top{display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin-bottom:.6rem}
+    .offre-title{font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--ink)}
+    .offre-badge{font-size:.73rem;font-weight:600;padding:.22rem .7rem;border-radius:100px;white-space:nowrap}
+    .offre-badge.cdi{background:#D4EDDA;color:#276230}
+    .offre-badge.cdd{background:#FFF3CD;color:#856404}
+    .offre-badge.stage{background:#E2D9F3;color:#5a3e8a}
+    .offre-desc{font-size:.86rem;color:var(--muted);line-height:1.6;margin-bottom:.85rem}
+    .offre-meta{display:flex;gap:.5rem;flex-wrap:wrap}
+    .offre-tag{background:var(--cream);border:1px solid var(--sage-lt);border-radius:100px;padding:.2rem .6rem;font-size:.74rem;color:var(--muted)}
+    .recr-candidature{background:var(--sage-dk);padding:4rem 8%}
+    .candidature-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+    .cand-text h2{font-family:var(--font-display);font-weight:800;font-size:1.9rem;line-height:1.1;letter-spacing:-.02em;color:var(--white);margin-bottom:.8rem}
+    .cand-text p{color:rgba(255,255,255,.7);font-size:.95rem;line-height:1.7}
+    .cand-form{display:flex;flex-direction:column;gap:.9rem}
+    .cand-form input,.cand-form textarea{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:.7rem;padding:.75rem 1rem;font-family:var(--font-body);font-size:.9rem;color:var(--white);outline:none;transition:border-color .2s;width:100%}
+    .cand-form input::placeholder,.cand-form textarea::placeholder{color:rgba(255,255,255,.45)}
+    .cand-form input:focus,.cand-form textarea:focus{border-color:var(--sun)}
+    .cand-form textarea{resize:vertical;min-height:100px}
+    .btn-cand{display:inline-block;background:var(--sun);color:var(--ink);padding:.85rem 2rem;border-radius:100px;font-weight:700;font-size:.92rem;border:none;cursor:pointer;font-family:var(--font-body);transition:background .2s,transform .15s}
+    .btn-cand:hover{background:#e0af4a;transform:translateY(-2px)}
+
+    /* ══ MODALE ══ */
+    .art-overlay{position:fixed;inset:0;z-index:400;background:rgba(28,43,26,.65);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .25s}
+    .art-overlay.open{opacity:1;pointer-events:all}
+    .art-box{background:var(--white);border-radius:1.6rem;width:100%;max-width:660px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(28,43,26,.25);transform:translateY(20px) scale(.97);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+    .art-overlay.open .art-box{transform:translateY(0) scale(1)}
+    .art-header{padding:1.3rem 1.7rem;border-bottom:1.5px solid var(--sage-lt);display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-shrink:0}
+    .art-close{background:var(--cream);border:1.5px solid var(--sage-lt);border-radius:50%;width:33px;height:33px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;color:var(--muted);flex-shrink:0;transition:background .2s}
+    .art-close:hover{background:var(--sage-lt)}
+    .art-body{overflow-y:auto;padding:1.7rem}
+    .art-body::-webkit-scrollbar{width:5px}
+    .art-body::-webkit-scrollbar-thumb{background:var(--sage-lt);border-radius:4px}
+    .art-visual{width:100%;border-radius:1rem;overflow:hidden;margin-bottom:1.3rem;background:var(--sage-lt);min-height:170px;display:flex;align-items:center;justify-content:center;font-size:3.8rem}
+    .art-visual img{width:100%;display:block}
+    .art-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:.55rem;margin-bottom:1.3rem}
+    .art-gallery img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:.55rem}
+    .art-body p{color:var(--muted);line-height:1.8;margin-bottom:.9rem;font-size:.93rem}
+    .art-menu{background:var(--cream);border-radius:.8rem;padding:.95rem 1.1rem;font-size:.85rem;color:var(--muted);line-height:1.8;border:1px solid var(--sage-lt)}
+
+    /* FOOTER */
+    footer{background:var(--sage-lt);color:var(--muted);padding:2.5rem 8%;display:flex;justify-content:space-between;align-items:center;gap:2rem;flex-wrap:wrap;border-top:1px solid var(--sage)}
+    .footer-logo{font-family:var(--font-display);font-weight:800;font-size:1.2rem;color:var(--sage-dk)}
+    .footer-logo span{color:var(--coral)}
+    footer p{font-size:.83rem}
+    footer a{color:var(--muted);text-decoration:none;transition:color .2s;font-size:.83rem}
+    footer a:hover{color:var(--sage-dk)}
+    .footer-links{display:flex;gap:1.8rem}
+
+    @media(max-width:900px){
+      .hero{grid-template-columns:1fr;min-height:auto}
+      .hero-visual{min-height:320px;height:360px}
+      .mission-grid,.inscription-grid,.contact-grid,.candidature-inner{grid-template-columns:1fr;gap:2.5rem}
+      .mission-pillars,.eco-grid{grid-template-columns:1fr}
+      .blog-grid,.recr-offres-grid{grid-template-columns:1fr}
+      .post-featured{grid-template-columns:1fr}
+      .recr-valeurs-grid{grid-template-columns:1fr}
+      section,.blog-hero,.recr-hero,.recr-valeurs,.recr-offres,.recr-candidature{padding-left:6%;padding-right:6%}
+      .blog-content{padding:2rem 6% 4rem}
+      .blog-filters{padding-left:6%;padding-right:6%}
+      .drawer{width:260px}
+    }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <button class="nav-logo" onclick="switchPage('site')">Pitchoun<span>'</span></button>
+  <button class="burger" id="burger" onclick="toggleMenu()" aria-label="Menu">
+    <div class="burger-bar"></div>
+    <div class="burger-bar"></div>
+    <div class="burger-bar"></div>
+  </button>
+</nav>
+
+<!-- ══ DRAWER ══ -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeMenu()"></div>
+<div class="drawer" id="drawer">
+
+  <div class="drawer-pages">
+    <button class="drawer-page-btn active" data-page="site" onclick="switchPage('site')">
+      <div class="dpb-bars"><div class="dpb-bar"></div><div class="dpb-bar"></div><div class="dpb-bar"></div></div>
+      <div class="dpb-info">
+        <span class="dpb-label">Le site</span>
+        <span class="dpb-sub">Accueil, crèches, inscription</span>
+      </div>
+    </button>
+    <button class="drawer-page-btn" data-page="blog" onclick="switchPage('blog')" id="dpb-blog">
+      <div class="dpb-bars"><div class="dpb-bar"></div><div class="dpb-bar"></div><div class="dpb-bar"></div></div>
+      <div class="dpb-info">
+        <span class="dpb-label">Actualités</span>
+        <span class="dpb-sub">Sorties, menus, événements</span>
+      </div>
+      <div class="dpb-dot"></div>
+    </button>
+    <button class="drawer-page-btn" data-page="recrutement" onclick="switchPage('recrutement')">
+      <div class="dpb-bars"><div class="dpb-bar"></div><div class="dpb-bar"></div><div class="dpb-bar"></div></div>
+      <div class="dpb-info">
+        <span class="dpb-label">Recrutement</span>
+        <span class="dpb-sub">Offres, candidatures</span>
+      </div>
+    </button>
+  </div>
+
+  <div class="drawer-anchors" id="drawer-anchors">
+    <a class="drawer-anchor" href="#mission" onclick="goAnchor('mission')">→ L'association</a>
+    <a class="drawer-anchor" href="#creches" onclick="goAnchor('creches')">→ Nos crèches</a>
+    <a class="drawer-anchor" href="#inscription" onclick="goAnchor('inscription')">→ Inscription</a>
+    <a class="drawer-anchor" href="#eco" onclick="goAnchor('eco')">→ Notre engagement</a>
+  </div>
+
+  <div class="drawer-contact">
+    <a href="#contact" onclick="goAnchor('contact')">✉️ Nous contacter</a>
+  </div>
+
+</div>
+
+<!-- ══ PAGE SITE ══ -->
+<div id="page-site" class="page active">
+  <section class="hero">
+    <div class="hero-text">
+      <span class="eyebrow">Bordeaux depuis 1986</span>
+      <h1>Grandir<br>en toute <em>confiance</em></h1>
+      <p class="hero-sub">Cinq crèches associatives à Bordeaux, portées par les familles et au service des enfants. Un accueil chaleureux, humain, et respectueux de chacun.</p>
+      <div class="hero-actions">
+        <a href="#creches" class="btn-primary">Découvrir nos crèches</a>
+        <a href="#inscription" class="btn-outline">Comment s'inscrire</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="blob-bg">
+        <svg viewBox="0 0 600 700" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <radialGradient id="g1" cx="40%" cy="40%"><stop offset="0%" stop-color="#C8DEC7"/><stop offset="100%" stop-color="#8BAF8A"/></radialGradient>
+            <radialGradient id="g2" cx="60%" cy="70%"><stop offset="0%" stop-color="#F2C063" stop-opacity=".6"/><stop offset="100%" stop-color="#E8836A" stop-opacity=".3"/></radialGradient>
+          </defs>
+          <ellipse cx="340" cy="280" rx="280" ry="320" fill="url(#g1)"/>
+          <ellipse cx="180" cy="480" rx="200" ry="180" fill="url(#g2)"/>
+          <circle cx="420" cy="140" r="55" fill="#FAF6EF" opacity=".5"/>
+          <circle cx="130" cy="260" r="35" fill="#4A7048" opacity=".18"/>
+          <circle cx="500" cy="500" r="80" fill="#E8836A" opacity=".15"/>
+          <path d="M260 80 Q320 40 370 90 Q340 160 270 140 Z" fill="#4A7048" opacity=".22"/>
+          <path d="M140 550 Q100 490 160 460 Q210 500 190 560 Z" fill="#F2C063" opacity=".4"/>
+        </svg>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-card"><div class="stat-num">580+</div><div class="stat-label">familles accueillies par an</div></div>
+        <div class="stat-card"><div class="stat-num">5</div><div class="stat-label">établissements à Bordeaux</div></div>
+        <div class="stat-card"><div class="stat-num">38</div><div class="stat-label">ans d'existence</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mission" id="mission">
+    <div class="mission-grid">
+      <div>
+        <div class="section-label">Notre raison d'être</div>
+        <h2 class="section-title">Une association <em>par</em> et <em>pour</em> les familles</h2>
+        <div class="mission-body">
+          <p>Née en 1986 à l'initiative de jeunes parents bordelais qui ne trouvaient pas de place en crèche, l'association Pitchoun' a grandi avec les familles qu'elle accueille.</p>
+          <p>Association à but non lucratif, cofinancée par la Ville de Bordeaux et la CAF, Pitchoun' place l'enfant au centre, dans le respect de son environnement familial, social et culturel.</p>
+        </div>
+      </div>
+      <div class="mission-pillars">
+        <div class="pillar"><div class="pillar-icon">🌱</div><h3>Écoute</h3><p>Entendre la demande des parents et leur proposer des réponses adaptées.</p></div>
+        <div class="pillar"><div class="pillar-icon">🤝</div><h3>Participation</h3><p>Valoriser la place des familles et encourager leur implication.</p></div>
+        <div class="pillar"><div class="pillar-icon">🌍</div><h3>Respect</h3><p>Accueillir chaque enfant dans le respect de sa culture et de ses valeurs.</p></div>
+        <div class="pillar"><div class="pillar-icon">💡</div><h3>Innovation</h3><p>Réfléchir, proposer et innover au service de la petite enfance.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="creches">
+    <div class="creches-intro">
+      <div class="section-label">Où nous trouver</div>
+      <h2 class="section-title">Cinq crèches au cœur<br>de <em>Bordeaux</em></h2>
+      <p>Chaque établissement a sa propre identité, son quartier, son équipe — mais tous partagent la même attention portée à l'enfant.</p>
+    </div>
+    <div class="creches-grid">
+      <div class="creche-card"><div class="creche-color-bar"></div><div class="creche-body"><div class="creche-name">Pitchoun' Caudéran</div><div class="creche-address">152 av. Charles de Gaulle — 33200 Bordeaux</div><div class="creche-meta"><span class="badge">54 places</span><span class="badge">Lun–Ven 7h30–18h30</span></div><div class="creche-contact">📞 05 57 01 99 92 · cauderan@pitchoun.org</div></div></div>
+      <div class="creche-card"><div class="creche-color-bar"></div><div class="creche-body"><div class="creche-name">Les Quatre Saisons</div><div class="creche-address">8 rue Jean Odin — 33000 Bordeaux</div><div class="creche-meta"><span class="badge">54 places</span><span class="badge">Lun–Ven 7h45–18h45</span></div><div class="creche-contact">📞 05 57 01 99 95 · quatresaisons@pitchoun.org</div></div></div>
+      <div class="creche-card"><div class="creche-color-bar"></div><div class="creche-body"><div class="creche-name">La Bastide</div><div class="creche-address">16 rue de Nuits — 33100 Bordeaux</div><div class="creche-meta"><span class="badge">54 places</span><span class="badge">Lun–Ven 8h–19h</span></div><div class="creche-contact">📞 05 57 01 99 94 · bastide@pitchoun.org</div></div></div>
+      <div class="creche-card"><div class="creche-color-bar"></div><div class="creche-body"><div class="creche-name">Cours de la Somme</div><div class="creche-address">130 cours de la Somme — 33800 Bordeaux</div><div class="creche-meta"><span class="badge">Siège social</span><span class="badge">Multi-accueil</span></div><div class="creche-contact">📞 05 57 01 99 90 · creches@pitchoun.org</div></div></div>
+      <div class="creche-card"><div class="creche-color-bar"></div><div class="creche-body"><div class="creche-name">5ème établissement</div><div class="creche-address">Bordeaux</div><div class="creche-meta"><span class="badge">Multi-accueil</span></div><div class="creche-contact">Contactez le siège pour plus d'infos</div></div></div>
+    </div>
+  </section>
+
+  <section class="inscription" id="inscription">
+    <div class="inscription-grid">
+      <div>
+        <div class="section-label">Rejoindre Pitchoun'</div>
+        <h2 class="section-title">Comment <em>inscrire</em> votre enfant</h2>
+        <div class="inscription-steps" style="margin-top:2rem">
+          <div class="step"><div class="step-num">1</div><div><h3>Pré-inscription en mairie</h3><p>Dès le 4e mois de grossesse, auprès du service MAPE de la Ville de Bordeaux.</p></div></div>
+          <div class="step"><div class="step-num">2</div><div><h3>Choix des établissements</h3><p>Jusqu'à trois établissements parmi toutes les crèches de Bordeaux.</p></div></div>
+          <div class="step"><div class="step-num">3</div><div><h3>Attribution selon les critères</h3><p>Un système de points prend en compte votre situation familiale et professionnelle.</p></div></div>
+          <div class="step"><div class="step-num">4</div><div><h3>Participation modulée</h3><p>Calculée selon vos revenus, suivant les barèmes CAF.</p></div></div>
+        </div>
+      </div>
+      <div class="inscription-aside">
+        <div class="aside-title">Documents utiles pour le RDV</div>
+        <div class="aside-item"><span>📄</span><span>Compte-rendu d'échographie</span></div>
+        <div class="aside-item"><span>📅</span><span>Calendrier de suivi personnalisé CPAM</span></div>
+        <div class="aside-item"><span>🏥</span><span>Certificat de grossesse</span></div>
+        <div class="aside-item" style="margin-top:.8rem;padding-top:1.2rem"><span>📞</span><div><strong style="color:var(--ink);display:block;margin-bottom:.2rem">Service MAPE — Ville de Bordeaux</strong>05.56.42.24.43<br><span style="font-size:.8rem">Sur rendez-vous ou par téléphone</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="eco" id="eco">
+    <div class="section-label">Notre engagement</div>
+    <h2 class="section-title">Un environnement <em>sain</em> pour grandir</h2>
+    <div class="eco-grid">
+      <div class="eco-card"><div class="eco-card-icon">🧴</div><h3>Produits écolabellisés</h3><p>Tous nos produits d'entretien portent l'écolabel européen. Des espaces plus sains pour les tout-petits.</p></div>
+      <div class="eco-card"><div class="eco-card-icon">🌿</div><h3>Soins naturels</h3><p>Le savon végétal remplace les produits chimiques pour les soins corporels des enfants accueillis.</p></div>
+      <div class="eco-card"><div class="eco-card-icon">🍽️</div><h3>Vaisselle sans plastique</h3><p>Assiettes et couverts en inox, porcelaine ou verre — plus de plastique dans les assiettes.</p></div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="contact-grid">
+      <div>
+        <div class="section-label">Parlons-nous</div>
+        <h2 class="section-title">Une question ? <em>Écrivez-nous</em></h2>
+        <div class="contact-info" style="margin-top:2rem">
+          <h3>Siège de l'association</h3><p>130 cours de la Somme — 33800 Bordeaux</p>
+          <h3>Téléphone</h3><p><a href="tel:0557019990">05 57 01 99 90</a></p>
+          <h3>Email</h3><p><a href="mailto:creches@pitchoun.org">creches@pitchoun.org</a></p>
+          <h3>Horaires du siège</h3><p>Lundi au vendredi — 9h à 17h</p>
+        </div>
+      </div>
+      <div>
+        <div class="contact-form">
+          <div class="form-row">
+            <div class="field"><label>Prénom</label><input type="text" placeholder="Marie"/></div>
+            <div class="field"><label>Nom</label><input type="text" placeholder="Dupont"/></div>
+          </div>
+          <div class="field"><label>Email</label><input type="email" placeholder="marie@exemple.fr"/></div>
+          <div class="field"><label>Sujet</label><select><option>Inscription / pré-inscription</option><option>Renseignement sur une crèche</option><option>Recrutement</option><option>Autre demande</option></select></div>
+          <div class="field"><label>Message</label><textarea placeholder="Votre message…"></textarea></div>
+          <button class="btn-submit" type="button" id="contact-submit" onclick="sendEmail()">Envoyer le message →</button>
+        <div id="contact-msg" style="margin-top:.8rem;font-size:.88rem;display:none"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="footer-logo">Pitchoun<span>'</span></div><p>Association loi 1901 · Bordeaux · Fondée en 1986</p><div class="footer-links"><a href="#">Mentions légales & RGPD</a><a href="https://www.facebook.com/p/Association-Pitchoun-100064698038969/" target="_blank" rel="noopener">Facebook</a><a href="https://www.instagram.com/associationpitchoun/" target="_blank" rel="noopener">Instagram</a><a href="https://fr.linkedin.com/company/association-pitchoun-bordeaux" target="_blank" rel="noopener">LinkedIn</a></div></footer>
+</div>
+
+<!-- ══ PAGE BLOG ══ -->
+<div id="page-blog" class="page">
+  <div class="blog-hero"><div class="blog-hero-inner"><span class="blog-eyebrow">Vie des crèches</span><h1>Nos <em>actualités</em></h1><p>Sorties, menus, événements et photos de nos petits explorateurs.</p></div></div>
+  <div class="blog-filters">
+    <button class="bfb active" data-type="all" onclick="blogFilter('all')">Tout <span class="bfb-c" id="cnt-all">–</span></button>
+    <button class="bfb" data-type="evenement" onclick="blogFilter('evenement')">📅 Événements <span class="bfb-c" id="cnt-evenement">–</span></button>
+    <button class="bfb" data-type="sortie" onclick="blogFilter('sortie')">🌳 Sorties <span class="bfb-c" id="cnt-sortie">–</span></button>
+    <button class="bfb" data-type="menu" onclick="blogFilter('menu')">🍽️ Menus <span class="bfb-c" id="cnt-menu">–</span></button>
+    <button class="bfb" data-type="photo" onclick="blogFilter('photo')">📸 Photos <span class="bfb-c" id="cnt-photo">–</span></button>
+    <button class="bfb" data-type="actu" onclick="blogFilter('actu')">📣 Actus <span class="bfb-c" id="cnt-actu">–</span></button>
+  </div>
+  <div class="blog-content"><div class="blog-grid" id="blog-grid"><div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted)">Chargement…</div></div></div>
+  <footer><div class="footer-logo">Pitchoun<span>'</span></div><p>Association loi 1901 · Bordeaux · Fondée en 1986</p><div class="footer-links"><a href="#">Mentions légales & RGPD</a></div></footer>
+</div>
+
+<!-- ══ PAGE RECRUTEMENT ══ -->
+<div id="page-recrutement" class="page">
+  <div class="recr-hero"><div class="recr-hero-inner"><span class="recr-eyebrow">Rejoindre l'équipe</span><h1>Travailler chez <em>Pitchoun'</em></h1><p>Nos équipes sont le cœur de l'association. Rejoignez une structure engagée, bienveillante, et portée par le sens.</p></div></div>
+  <div class="recr-valeurs">
+    <div class="section-label">Ce que nous offrons</div>
+    <h2 class="section-title">Pourquoi nous <em>rejoindre</em></h2>
+    <div class="recr-valeurs-grid">
+      <div class="valeur-card"><div class="valeur-icon">🌱</div><div class="valeur-text"><strong>Un projet éducatif fort</strong><span>Des pratiques bienveillantes et une pédagogie centrée sur l'enfant.</span></div></div>
+      <div class="valeur-card"><div class="valeur-icon">🤝</div><div class="valeur-text"><strong>Une équipe engagée</strong><span>Des collègues investis, une direction à l'écoute et une vraie cohésion.</span></div></div>
+      <div class="valeur-card"><div class="valeur-icon">📚</div><div class="valeur-text"><strong>Formation continue</strong><span>Des temps de réflexion collective et des formations tout au long de l'année.</span></div></div>
+      <div class="valeur-card"><div class="valeur-icon">⚖️</div><div class="valeur-text"><strong>Convention ALISFA</strong><span>Rémunération selon la grille de la convention, congés et avantages associatifs.</span></div></div>
+    </div>
+  </div>
+  <div class="recr-offres">
+    <div class="section-label">Postes ouverts</div>
+    <h2 class="section-title">Nos <em>offres d'emploi</em></h2>
+    <div class="recr-offres-grid">
+      <div class="offre-card"><div class="offre-top"><div class="offre-title">Éducateur·rice de Jeunes Enfants</div><span class="offre-badge cdi">CDI</span></div><div class="offre-desc">Accompagner le développement global des enfants, concevoir et animer des activités d'éveil, et soutenir les familles dans leur parentalité.</div><div class="offre-meta"><span class="offre-tag">📍 Bordeaux</span><span class="offre-tag">Diplôme EJE requis</span><span class="offre-tag">Temps plein</span></div></div>
+      <div class="offre-card"><div class="offre-top"><div class="offre-title">Auxiliaire de Puériculture</div><span class="offre-badge cdi">CDI</span></div><div class="offre-desc">Assurer les soins quotidiens, participer à l'accueil des enfants de 2 mois à 4 ans et contribuer à leur bien-être.</div><div class="offre-meta"><span class="offre-tag">📍 Plusieurs établissements</span><span class="offre-tag">Diplôme AP requis</span></div></div>
+      <div class="offre-card"><div class="offre-top"><div class="offre-title">Agent de crèche / CAP AEPE</div><span class="offre-badge cdd">CDD</span></div><div class="offre-desc">Participer à l'accueil et aux activités des enfants, assister l'équipe éducative et veiller à l'hygiène des espaces de vie.</div><div class="offre-meta"><span class="offre-tag">📍 Bordeaux</span><span class="offre-tag">CAP AEPE ou équivalent</span></div></div>
+      <div class="offre-card"><div class="offre-top"><div class="offre-title">Stage EJE / AP / CAP AEPE</div><span class="offre-badge stage">Stage</span></div><div class="offre-desc">Pitchoun' accueille régulièrement des étudiants en formation dans ses cinq établissements bordelais.</div><div class="offre-meta"><span class="offre-tag">📍 Bordeaux</span><span class="offre-tag">En formation</span><span class="offre-tag">Convention requise</span></div></div>
+    </div>
+  </div>
+  <div class="recr-candidature">
+    <div class="candidature-inner">
+      <div class="cand-text"><h2>Envoyer votre candidature</h2><p>Vous ne trouvez pas le poste idéal ? Envoyez-nous votre CV et lettre de motivation, nous restons à l'écoute de tous les profils engagés.</p></div>
+      <div class="cand-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem"><input type="text" placeholder="Prénom"/><input type="text" placeholder="Nom"/></div>
+        <input type="email" placeholder="Votre email"/>
+        <input type="text" placeholder="Poste souhaité"/>
+        <textarea placeholder="Quelques mots sur votre parcours…" rows="4"></textarea>
+        <button class="btn-cand" type="button">Envoyer ma candidature →</button>
+      </div>
+    </div>
+  </div>
+  <footer><div class="footer-logo">Pitchoun<span>'</span></div><p>Association loi 1901 · Bordeaux · Fondée en 1986</p><div class="footer-links"><a href="#">Mentions légales & RGPD</a></div></footer>
+</div>
+
+<!-- ══ MODALE ARTICLE ══ -->
+<div class="art-overlay" id="art-overlay">
+  <div class="art-box">
+    <div class="art-header">
+      <div><div id="art-pill" style="margin-bottom:.55rem"></div><h2 id="art-titre" style="font-family:'Fraunces',Georgia,serif;font-weight:800;font-size:1.3rem;line-height:1.15;color:#1C2B1A"></h2><div id="art-meta" style="font-size:.78rem;color:#6B7F6A;margin-top:.3rem"></div></div>
+      <button class="art-close" id="art-close">✕</button>
+    </div>
+    <div class="art-body" id="art-body"></div>
+  </div>
+</div>
+
+<script>
+// ══ MENU ══
+function toggleMenu(){
+  const b=document.getElementById('burger');
+  const d=document.getElementById('drawer');
+  const o=document.getElementById('drawer-overlay');
+  const open=d.classList.contains('open');
+  b.classList.toggle('open',!open);
+  d.classList.toggle('open',!open);
+  o.classList.toggle('open',!open);
+}
+function closeMenu(){
+  document.getElementById('burger').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+}
+
+// ══ NAVIGATION ══
+function switchPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.drawer-page-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelector(`.drawer-page-btn[data-page="${page}"]`).classList.add('active');
+  // Ancres : visibles seulement sur le site principal
+  document.getElementById('drawer-anchors').style.display = page==='site' ? 'block' : 'none';
+  window.scrollTo({top:0,behavior:'instant'});
+  closeMenu();
+}
+
+function goAnchor(id){
+  switchPage('site');
+  setTimeout(()=>{
+    const el=document.getElementById(id);
+    if(el) el.scrollIntoView({behavior:'smooth'});
+  },50);
+}
+
+// ══ BLOG ══
+const STORAGE_KEY="pitchoun_admin_v2";
+const DEMO=[
+  {id:1,type:"evenement",titre:"Fête de fin d'année — Vendredi 27 juin",contenu:"Toutes les familles sont invitées à notre grande fête de fin d'année ! Au programme : spectacle des enfants, buffet partagé, kermesse et remise des diplômes. Rendez-vous à 16h dans le jardin de la crèche Caudéran.",creche:"Pitchoun' Caudéran",date:"2026-06-27",images:[],publie:true,emoji:"🎉",bg:"#FDF0EC"},
+  {id:2,type:"sortie",titre:"Sortie au Parc Bordelais",contenu:"Mardi matin, les enfants des moyens ont exploré le Parc Bordelais sous un soleil généreux. Course dans les feuilles, découverte des canards, pique-nique sur l'herbe.",creche:"Les Quatre Saisons",date:"2026-06-17",images:[{id:1,src:"https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=600&q=75",caption:""},{id:2,src:"https://images.unsplash.com/photo-1544776193-352d25ca82cd?w=600&q=75",caption:""},{id:3,src:"https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=600&q=75",caption:""},{id:4,src:"https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=600&q=75",caption:""}],publie:true,emoji:"🌳",bg:"#EDF4ED"},
+  {id:3,type:"menu",titre:"Menu de la semaine — 23 au 27 juin",contenu:"Notre cuisinière Nathalie a concocté des repas frais et équilibrés avec des produits locaux girondins.",creche:"Toutes les crèches",date:"2026-06-23",images:[],publie:true,emoji:"🍽️",bg:"#FFF9E6",menu_semaine:"🟢 Lundi — Velouté de courgettes · Poulet rôti, haricots verts · Compote\n🔵 Mardi — Carottes râpées · Saumon vapeur, riz basmati · Banane\n🟡 Mercredi — Salade de tomates · Hachis Parmentier · Poire\n🟠 Jeudi — Brocolis vapeur · Omelette aux herbes, purée · Pêche\n🔴 Vendredi — Melon · Gratin de courgettes · Tartines maison"},
+  {id:4,type:"photo",titre:"Atelier peinture végétale — La Bastide",contenu:"Les enfants ont créé leurs propres couleurs avec du jus de betterave, d'épinard et de curcuma. Des œuvres 100 % naturelles !",creche:"La Bastide",date:"2026-06-12",images:[{id:1,src:"https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&q=75",caption:""},{id:2,src:"https://images.unsplash.com/photo-1533038590840-1cde6e668a91?w=600&q=75",caption:""},{id:3,src:"https://images.unsplash.com/photo-1551892374-ecf8754cf8b0?w=600&q=75",caption:""}],publie:true,emoji:"🎨",bg:"#F3EFFA"},
+  {id:5,type:"actu",titre:"Fermeture exceptionnelle — 14 juillet",contenu:"Nos cinq crèches seront fermées le lundi 14 juillet 2026. Elles rouvriront normalement le mardi 15 juillet à leurs horaires habituels.",creche:"Toutes les crèches",date:"2026-06-10",images:[],publie:true,emoji:"📣",bg:"#E8F4F8"},
+  {id:6,type:"sortie",titre:"Visite à la ferme pédagogique de Budos",contenu:"Les grands ont passé une matinée inoubliable à la ferme. Vaches, poules, lapins et cochons étaient au rendez-vous !",creche:"Cours de la Somme",date:"2026-06-05",images:[{id:1,src:"https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=600&q=75",caption:""},{id:2,src:"https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=600&q=75",caption:""}],publie:true,emoji:"🐄",bg:"#EDF4ED"},
+];
+const TCFG={evenement:{label:"📅 Événement",cls:"pill-evenement"},sortie:{label:"🌳 Sortie",cls:"pill-sortie"},menu:{label:"🍽️ Menu",cls:"pill-menu"},photo:{label:"📸 Photo",cls:"pill-photo"},actu:{label:"📣 Actualité",cls:"pill-actu"}};
+let POSTS=[],activeFilter="all";
+
+async function loadAdmin(){
+  try{const r=await window.storage.get(STORAGE_KEY);if(r&&r.value){const d=JSON.parse(r.value);if(d.posts&&d.posts.length){POSTS=d.posts.filter(p=>p.publie);return}}}catch(e){}
+  POSTS=DEMO;
+}
+function fmtD(d){return new Date(d+"T12:00:00").toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})}
+function pill(type){const c=TCFG[type]||TCFG.actu;return`<span class="pill ${c.cls}">${c.label}</span>`}
+function blogFilter(type){activeFilter=type;document.querySelectorAll(".bfb").forEach(b=>b.classList.toggle("active",b.dataset.type===type));renderBlog()}
+function updateCounts(){const p=POSTS.filter(x=>x.publie!==false);document.getElementById("cnt-all").textContent=p.length;["evenement","sortie","menu","photo","actu"].forEach(t=>{const e=document.getElementById("cnt-"+t);if(e)e.textContent=p.filter(x=>x.type===t).length});if(p.length)document.getElementById("dpb-blog").classList.add("has-notif")}
+function renderBlog(){
+  const list=POSTS.filter(p=>p.publie!==false&&(activeFilter==="all"||p.type===activeFilter)).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const g=document.getElementById("blog-grid");
+  if(!list.length){g.innerHTML=`<div class="blog-empty"><div class="blog-empty-icon">📭</div><p>Aucune publication dans cette catégorie.</p></div>`;return}
+  let h="";
+  if(activeFilter==="all"){h+=rFeat(list[0]);list.slice(1).forEach(p=>{h+=rCard(p)})}
+  else{list.forEach(p=>{h+=rCard(p)})}
+  g.innerHTML=h;
+  g.querySelectorAll(".post-card,.post-featured").forEach((el,i)=>{el.style.animation=`fadeUp .4s ease ${i*.07}s both`});
+}
+function rFeat(p){const hi=p.images&&p.images.length>0;const v=hi?`<img src="${p.images[0].src}" alt="" loading="lazy">`:(p.emoji||"📰");return`<div class="post-featured" onclick="openArt(${p.id})"><div class="pf-visual" style="background:${p.bg||'#C8DEC7'}">${v}</div><div class="pf-body">${pill(p.type)}<h2>${p.titre}</h2><p>${p.contenu.slice(0,170)}${p.contenu.length>170?"…":""}</p><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem"><span style="font-size:.76rem;color:var(--muted)">${fmtD(p.date)}</span>${p.creche&&p.creche!=="Toutes les crèches"?`<span class="pc-tag">${p.creche}</span>`:""}</div></div></div>`}
+function rCard(p){const hi=p.images&&p.images.length>0;let v="";if(hi&&p.images.length>=3){const ex=p.images.length-3;v=`<div class="pc-visual" style="background:${p.bg||'#C8DEC7'}"><div class="mini-gal">${p.images.slice(0,3).map((img,i)=>`<div class="mini-gal-item"><img src="${img.src}" alt="" loading="lazy"${i===2&&ex>0?' style="filter:brightness(.35)"':""}>${i===2&&ex>0?`<div class="mini-gal-more">+${ex+1}</div>`:""}</div>`).join("")}</div></div>`}else if(hi){v=`<div class="pc-visual" style="background:${p.bg||'#C8DEC7'}"><img src="${p.images[0].src}" alt="" loading="lazy"></div>`}else{v=`<div class="pc-visual" style="background:${p.bg||'#C8DEC7'}">${p.emoji||"📰"}</div>`}const mp=p.type==="menu"&&p.menu_semaine?`<div class="menu-prev">${p.menu_semaine.split("\n").slice(0,3).join("\n")}${p.menu_semaine.split("\n").length>3?"\n…":""}</div>`:"";return`<div class="post-card" onclick="openArt(${p.id})">${v}<div class="pc-body">${pill(p.type)}<h3>${p.titre}</h3>${p.type!=="menu"?`<p>${p.contenu.slice(0,100)}${p.contenu.length>100?"…":""}</p>`:""}${mp}<div class="pc-footer"><span class="pc-date">${fmtD(p.date)}</span>${p.creche&&p.creche!=="Toutes les crèches"?`<span class="pc-tag">${p.creche}</span>`:""}</div></div></div>`}
+function openArt(id){const p=POSTS.find(x=>x.id===id);if(!p)return;document.getElementById("art-pill").innerHTML=pill(p.type);document.getElementById("art-titre").textContent=p.titre;document.getElementById("art-meta").innerHTML=fmtD(p.date)+(p.creche&&p.creche!=="Toutes les crèches"?` · <strong style="color:#4A7048">${p.creche}</strong>`:"");let b="";if(p.images&&p.images.length>0){b+=p.images.length===1?`<div class="art-visual"><img src="${p.images[0].src}" alt=""></div>`:`<div class="art-gallery">${p.images.map(img=>`<img src="${img.src}" alt="" loading="lazy">`).join("")}</div>`}else{b+=`<div class="art-visual" style="background:${p.bg||'#C8DEC7'}">${p.emoji||"📰"}</div>`}b+=`<p>${p.contenu}</p>`;if(p.type==="menu"&&p.menu_semaine)b+=`<div class="art-menu">${p.menu_semaine.replace(/\n/g,"<br>")}</div>`;document.getElementById("art-body").innerHTML=b;document.getElementById("art-overlay").classList.add("open");document.body.style.overflow="hidden"}
+document.getElementById("art-close").addEventListener("click",()=>{document.getElementById("art-overlay").classList.remove("open");document.body.style.overflow=""});
+document.getElementById("art-overlay").addEventListener("click",e=>{if(e.target===document.getElementById("art-overlay")){document.getElementById("art-overlay").classList.remove("open");document.body.style.overflow=""}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){document.getElementById("art-overlay").classList.remove("open");document.body.style.overflow=""}});
+
+(async()=>{await loadAdmin();updateCounts();renderBlog()})();
+
+// ══ ADMIN : détection #admin dans l'URL ══
+const LS_KEY = "pitchoun_data_v1";
+const ADMIN_PWD = "Pitchoun2026";
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch(e) { return {}; }
+}
+function saveData(d) {
+  localStorage.setItem(LS_KEY, JSON.stringify(d));
+}
+
+function checkAdminHash() {
+  if (window.location.hash === "#admin") showAdminLogin();
+}
+window.addEventListener("hashchange", checkAdminHash);
+
+function showAdminLogin() {
+  // Supprimer si déjà ouvert
+  const ex = document.getElementById("admin-root");
+  if (ex) ex.remove();
+
+  const root = document.createElement("div");
+  root.id = "admin-root";
+  root.innerHTML = `
+  <style>
+    #admin-root *{box-sizing:border-box;margin:0;padding:0;font-family:'DM Sans',system-ui,sans-serif}
+    #admin-overlay{position:fixed;inset:0;z-index:9000;background:rgba(28,43,26,.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1rem}
+    #admin-login{background:#FAF6EF;border-radius:1.4rem;padding:2.5rem;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(28,43,26,.25);text-align:center}
+    #admin-login h2{font-family:'Fraunces',Georgia,serif;font-size:1.4rem;font-weight:800;color:#4A7048;margin-bottom:.4rem}
+    #admin-login p{font-size:.82rem;color:#6B7F6A;margin-bottom:1.6rem}
+    #admin-pwd{width:100%;border:1.5px solid #C8DEC7;border-radius:.7rem;padding:.75rem 1rem;font-size:.95rem;color:#1C2B1A;outline:none;margin-bottom:.8rem;text-align:center;letter-spacing:.1em}
+    #admin-pwd:focus{border-color:#4A7048}
+    #admin-pwd-err{color:#dc3545;font-size:.8rem;margin-bottom:.6rem;display:none}
+    #admin-login-btn{width:100%;background:#4A7048;color:#fff;border:none;padding:.85rem;border-radius:.7rem;font-weight:700;font-size:.95rem;cursor:pointer}
+    #admin-login-btn:hover{background:#8BAF8A}
+    #admin-cancel{margin-top:.8rem;background:none;border:none;color:#6B7F6A;font-size:.82rem;cursor:pointer;text-decoration:underline}
+  </style>
+  <div id="admin-overlay">
+    <div id="admin-login">
+      <div style="font-size:2rem;margin-bottom:.5rem">🔒</div>
+      <h2>Pitchoun' Admin</h2>
+      <p>Entrez le mot de passe pour accéder au panneau d'administration</p>
+      <input type="password" id="admin-pwd" placeholder="••••••••••••" autocomplete="off"/>
+      <div id="admin-pwd-err">Mot de passe incorrect</div>
+      <button id="admin-login-btn">Accéder →</button>
+      <br><button id="admin-cancel">Annuler</button>
+    </div>
+  </div>`;
+  document.body.appendChild(root);
+
+  const inp = root.querySelector("#admin-pwd");
+  const err = root.querySelector("#admin-pwd-err");
+  inp.focus();
+
+  root.querySelector("#admin-login-btn").addEventListener("click", () => {
+    if (inp.value === ADMIN_PWD) { root.remove(); showAdminPanel(); }
+    else { err.style.display="block"; inp.value=""; inp.focus(); }
+  });
+  inp.addEventListener("keydown", e => { if(e.key==="Enter") root.querySelector("#admin-login-btn").click(); });
+  root.querySelector("#admin-cancel").addEventListener("click", () => { root.remove(); history.replaceState(null,"",window.location.pathname); });
+}
+
+function showAdminPanel() {
+  const ex = document.getElementById("admin-panel-root");
+  if (ex) ex.remove();
+  const data = loadData();
+
+  const CRECHES_DEF = [
+    {nom:"Pitchoun' Caudéran",adresse:"152 av. Charles de Gaulle, 33200 Bordeaux",tel:"05 57 01 99 92",email:"cauderan@pitchoun.org",horaires:"Lun–Ven 7h30–18h30",places:"54"},
+    {nom:"Les Quatre Saisons",adresse:"8 rue Jean Odin, 33000 Bordeaux",tel:"05 57 01 99 95",email:"quatresaisons@pitchoun.org",horaires:"Lun–Ven 7h45–18h45",places:"54"},
+    {nom:"La Bastide",adresse:"16 rue de Nuits, 33100 Bordeaux",tel:"05 57 01 99 94",email:"bastide@pitchoun.org",horaires:"Lun–Ven 8h00–19h00",places:"54"},
+    {nom:"Cours de la Somme",adresse:"130 cours de la Somme, 33800 Bordeaux",tel:"05 57 01 99 90",email:"creches@pitchoun.org",horaires:"Siège social",places:"—"},
+    {nom:"5ème établissement",adresse:"Bordeaux",tel:"05 57 01 99 90",email:"creches@pitchoun.org",horaires:"Contacter le siège",places:"—"},
+  ];
+  const creches = data.creches || CRECHES_DEF;
+  const posts = data.posts || [];
+  const contact = data.contact || {adresse:"130 cours de la Somme, 33800 Bordeaux",tel:"05 57 01 99 90",email:"creches@pitchoun.org",horaires:"Lundi au vendredi — 9h à 17h"};
+
+  const POST_TYPES = [{id:"evenement",label:"📅 Événement"},{id:"sortie",label:"🌳 Sortie"},{id:"menu",label:"🍽️ Menu"},{id:"photo",label:"📸 Photo"},{id:"actu",label:"📣 Actualité"}];
+  const CRECHES_NAMES = ["Toutes les crèches","Pitchoun' Caudéran","Les Quatre Saisons","La Bastide","Cours de la Somme","5ème établissement"];
+
+  const root = document.createElement("div");
+  root.id = "admin-panel-root";
+
+  root.innerHTML = `
+  <style>
+    #ap{position:fixed;inset:0;z-index:9000;background:#FAF6EF;overflow:hidden;display:flex;flex-direction:column;font-family:'DM Sans',system-ui,sans-serif}
+    #ap *{box-sizing:border-box}
+    #ap-bar{background:#4A7048;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.8rem;flex-shrink:0}
+    #ap-bar h1{font-family:'Fraunces',Georgia,serif;font-size:1.15rem;font-weight:800}
+    #ap-bar-actions{display:flex;gap:.7rem;align-items:center}
+    .ap-bar-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:.45rem 1rem;border-radius:.5rem;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;transition:background .2s}
+    .ap-bar-btn:hover{background:rgba(255,255,255,.28)}
+    .ap-bar-btn.sun{background:#F2C063;color:#1C2B1A}
+    .ap-bar-btn.sun:hover{background:#e0af4a}
+    #ap-tabs{background:#fff;border-bottom:1.5px solid #C8DEC7;display:flex;padding:0 1.8rem;flex-shrink:0;overflow-x:auto}
+    .ap-tab{background:none;border:none;padding:.85rem 1.2rem;font-family:inherit;font-size:.85rem;font-weight:500;color:#6B7F6A;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;white-space:nowrap;transition:color .15s,border-color .15s}
+    .ap-tab:hover{color:#4A7048}
+    .ap-tab.active{color:#4A7048;border-bottom-color:#4A7048;font-weight:700}
+    #ap-body{overflow-y:auto;flex:1;padding:1.8rem}
+    #ap-body::-webkit-scrollbar{width:5px}
+    #ap-body::-webkit-scrollbar-thumb{background:#C8DEC7;border-radius:4px}
+    .ap-card{background:#fff;border:1.5px solid #C8DEC7;border-radius:1rem;margin-bottom:1.1rem;overflow:hidden}
+    .ap-card-head{background:#C8DEC7;padding:.7rem 1.2rem;font-weight:700;font-size:.88rem;color:#4A7048;display:flex;align-items:center;justify-content:space-between}
+    .ap-card-body{padding:1.2rem}
+    .ap-field{display:flex;flex-direction:column;gap:.28rem;margin-bottom:.85rem}
+    .ap-field label{font-size:.72rem;font-weight:700;color:#6B7F6A;text-transform:uppercase;letter-spacing:.06em}
+    .ap-field input,.ap-field textarea,.ap-field select{border:1.5px solid #C8DEC7;border-radius:.6rem;padding:.6rem .85rem;font-family:inherit;font-size:.85rem;color:#1C2B1A;outline:none;width:100%;background:#FAF6EF;transition:border-color .2s}
+    .ap-field input:focus,.ap-field textarea:focus,.ap-field select:focus{border-color:#4A7048;background:#fff}
+    .ap-field textarea{resize:vertical;min-height:80px;line-height:1.6}
+    .ap-2col{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}
+    .ap-btn{padding:.55rem 1.2rem;border-radius:.6rem;border:none;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;transition:opacity .2s}
+    .ap-btn-green{background:#4A7048;color:#fff}
+    .ap-btn-green:hover{opacity:.85}
+    .ap-btn-red{background:#f8d7da;color:#842029}
+    .ap-btn-red:hover{opacity:.85}
+    .ap-btn-ghost{background:#C8DEC7;color:#4A7048}
+    .ap-btn-ghost:hover{opacity:.85}
+    .ap-toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;background:#D4EDDA;color:#276230;padding:.75rem 1.3rem;border-radius:.8rem;font-weight:700;font-size:.85rem;box-shadow:0 4px 20px rgba(0,0,0,.15);opacity:0;transition:opacity .3s;pointer-events:none}
+    .ap-toast.show{opacity:1}
+    .ap-toggle{width:40px;height:22px;border-radius:100px;background:#ccc;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;border:none}
+    .ap-toggle.on{background:#4A7048}
+    .ap-toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+    .ap-toggle.on::after{left:21px}
+    .post-row{display:flex;align-items:center;gap:.8rem;padding:.85rem 1.2rem;border-bottom:1px solid #C8DEC7;transition:background .15s}
+    .post-row:last-child{border-bottom:none}
+    .post-row:hover{background:#FAF6EF}
+    .post-row-info{flex:1;min-width:0}
+    .post-row-title{font-weight:700;font-size:.88rem;color:#1C2B1A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .post-row-meta{font-size:.73rem;color:#6B7F6A;margin-top:.15rem}
+    #ap-section{display:none}
+    #ap-section.active{display:block}
+  </style>
+
+  <div id="ap">
+    <div id="ap-bar">
+      <h1>⚙️ Pitchoun' Admin</h1>
+      <div id="ap-bar-actions">
+        <button class="ap-bar-btn" onclick="adminExport()">⬇ Exporter</button>
+        <label class="ap-bar-btn" style="cursor:pointer">⬆ Importer<input type="file" accept=".json" style="display:none" onchange="adminImport(event)"></label>
+        <button class="ap-bar-btn sun" id="ap-save-btn" onclick="adminSave()">💾 Sauvegarder</button>
+        <button class="ap-bar-btn" onclick="adminClose()">✕ Fermer</button>
+      </div>
+    </div>
+    <div id="ap-tabs">
+      <button class="ap-tab active" onclick="apTab('blog')">📰 Blog / Actualités</button>
+      <button class="ap-tab" onclick="apTab('creches')">🏠 Crèches</button>
+      <button class="ap-tab" onclick="apTab('contact')">📞 Contact</button>
+    </div>
+    <div id="ap-body">
+
+      <!-- BLOG -->
+      <div id="ap-section-blog" class="ap-section active" style="display:block">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.1rem">
+          <div style="font-weight:700;color:#1C2B1A">Publications <span id="ap-post-count" style="background:#C8DEC7;color:#4A7048;font-size:.72rem;padding:.1rem .5rem;border-radius:100px;margin-left:.4rem"></span></div>
+          <button class="ap-btn ap-btn-green" onclick="apNewPost()">+ Nouvelle publication</button>
+        </div>
+        <div id="ap-posts-list" class="ap-card"></div>
+        <div id="ap-post-editor" style="display:none"></div>
+      </div>
+
+      <!-- CRECHES -->
+      <div id="ap-section-creches" class="ap-section" style="display:none">
+        <div id="ap-creches-list"></div>
+      </div>
+
+      <!-- CONTACT -->
+      <div id="ap-section-contact" class="ap-section" style="display:none">
+        <div class="ap-card">
+          <div class="ap-card-head">📞 Coordonnées du siège</div>
+          <div class="ap-card-body">
+            <div class="ap-field"><label>Adresse</label><input type="text" id="ap-ct-addr" value="${contact.adresse}"></div>
+            <div class="ap-2col">
+              <div class="ap-field"><label>Téléphone</label><input type="tel" id="ap-ct-tel" value="${contact.tel}"></div>
+              <div class="ap-field"><label>Email</label><input type="email" id="ap-ct-email" value="${contact.email}"></div>
+            </div>
+            <div class="ap-field"><label>Horaires</label><input type="text" id="ap-ct-hours" value="${contact.horaires}"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="ap-toast" id="ap-toast"></div>
+  </div>`;
+
+  document.body.appendChild(root);
+
+  // État local de l'admin
+  let adminPosts = JSON.parse(JSON.stringify(posts));
+  let adminCreches = JSON.parse(JSON.stringify(creches));
+  let editingPost = null;
+
+  // ── TABS ──
+  window.apTab = function(tab) {
+    document.querySelectorAll(".ap-tab").forEach((t,i) => t.classList.toggle("active", ["blog","creches","contact"][i]===tab));
+    document.querySelectorAll(".ap-section").forEach(s => s.style.display="none");
+    document.getElementById("ap-section-"+tab).style.display="block";
+    if(tab==="creches") renderCreches();
+  };
+
+  // ── TOAST ──
+  function toast(msg) {
+    const t=document.getElementById("ap-toast");
+    t.textContent=msg; t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"),2500);
+  }
+
+  // ── BLOG : liste ──
+  function renderPostsList() {
+    const list = document.getElementById("ap-posts-list");
+    document.getElementById("ap-post-count").textContent = adminPosts.length;
+    if(!adminPosts.length) { list.innerHTML=`<div style="padding:2rem;text-align:center;color:#6B7F6A;font-size:.88rem">Aucune publication — cliquez sur "+ Nouvelle publication"</div>`; return; }
+    const sorted = [...adminPosts].sort((a,b)=>new Date(b.date)-new Date(a.date));
+    list.innerHTML = sorted.map(p => {
+      const tc = {evenement:"#FDF0EC",sortie:"#EDF4ED",menu:"#FFF9E6",photo:"#F3EFFA",actu:"#E8F4F8"}[p.type]||"#eee";
+      const tl = {evenement:"📅",sortie:"🌳",menu:"🍽️",photo:"📸",actu:"📣"}[p.type]||"📰";
+      return `<div class="post-row">
+        <span style="font-size:1.3rem">${tl}</span>
+        <div class="post-row-info">
+          <div class="post-row-title">${p.titre||"Sans titre"}</div>
+          <div class="post-row-meta">${p.date} · ${p.creche||""} · <span style="color:${p.publie?"#276230":"#856404"};font-weight:600">${p.publie?"✓ Publié":"Brouillon"}</span></div>
+        </div>
+        <button class="ap-btn ap-btn-ghost" onclick="apEditPost(${p.id})" style="font-size:.78rem;padding:.38rem .8rem">✏️</button>
+        <button class="ap-toggle ${p.publie?"on":""}" onclick="apTogglePost(${p.id})" title="${p.publie?"Dépublier":"Publier"}"></button>
+        <button class="ap-btn ap-btn-red" onclick="apDeletePost(${p.id})" style="font-size:.78rem;padding:.38rem .7rem">🗑</button>
+      </div>`;
+    }).join("");
+  }
+
+  // ── BLOG : éditeur ──
+  function renderPostEditor(p) {
+    const ed = document.getElementById("ap-post-editor");
+    ed.style.display = "block";
+    document.getElementById("ap-posts-list").style.display = "none";
+    ed.innerHTML = `
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:1.2rem">
+      <button class="ap-btn ap-btn-ghost" onclick="apCancelEdit()">← Retour</button>
+      <span style="font-weight:700;color:#1C2B1A">${p.id?"Modifier":"Nouvelle publication"}</span>
+    </div>
+    <div class="ap-card">
+      <div class="ap-card-body">
+        <div class="ap-2col">
+          <div class="ap-field"><label>Type</label>
+            <select id="ed-type">
+              ${POST_TYPES.map(t=>`<option value="${t.id}"${p.type===t.id?" selected":""}>${t.label}</option>`).join("")}
+            </select>
+          </div>
+          <div class="ap-field"><label>Crèche</label>
+            <select id="ed-creche">
+              ${CRECHES_NAMES.map(n=>`<option${p.creche===n?" selected":""}>${n}</option>`).join("")}
+            </select>
+          </div>
+        </div>
+        <div class="ap-field"><label>Date</label><input type="date" id="ed-date" value="${p.date||new Date().toISOString().slice(0,10)}"></div>
+        <div class="ap-field"><label>Titre</label><input type="text" id="ed-titre" value="${p.titre||""}" placeholder="Titre de la publication"></div>
+        <div class="ap-field"><label>Contenu</label><textarea id="ed-contenu" rows="4" placeholder="Description…">${p.contenu||""}</textarea></div>
+        <div id="ed-menu-field" style="display:${p.type==='menu'?'block':'none'}">
+          <div class="ap-field"><label>Détail du menu</label><textarea id="ed-menu" rows="6" placeholder="🟢 Lundi — ...">${p.menu_semaine||""}</textarea></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.8rem;padding:.8rem;background:#FAF6EF;border-radius:.6rem;margin-top:.4rem">
+          <button class="ap-toggle ${p.publie?"on":""}" id="ed-publie-toggle" onclick="this.classList.toggle('on')"></button>
+          <span id="ed-publie-label" style="font-size:.85rem;font-weight:600;color:${p.publie?"#4A7048":"#6B7F6A"}">${p.publie?"✓ Publié sur le site":"Brouillon"}</span>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.8rem;margin-top:.5rem">
+      <button class="ap-btn ap-btn-green" onclick="apSavePost()">💾 Enregistrer</button>
+      <button class="ap-btn ap-btn-ghost" onclick="apCancelEdit()">Annuler</button>
+    </div>`;
+
+    // Mise à jour du champ menu selon le type
+    document.getElementById("ed-type").addEventListener("change", function() {
+      document.getElementById("ed-menu-field").style.display = this.value==="menu" ? "block" : "none";
+      const tog = document.getElementById("ed-publie-toggle");
+      const lbl = document.getElementById("ed-publie-label");
+      lbl.textContent = tog.classList.contains("on") ? "✓ Publié sur le site" : "Brouillon";
+      lbl.style.color = tog.classList.contains("on") ? "#4A7048" : "#6B7F6A";
+    });
+    document.getElementById("ed-publie-toggle").addEventListener("click", function() {
+      setTimeout(()=>{
+        const on = this.classList.contains("on");
+        const lbl = document.getElementById("ed-publie-label");
+        lbl.textContent = on ? "✓ Publié sur le site" : "Brouillon";
+        lbl.style.color = on ? "#4A7048" : "#6B7F6A";
+      },50);
+    });
+  }
+
+  window.apNewPost = function() {
+    editingPost = {id:Date.now(),type:"actu",titre:"",contenu:"",creche:"Toutes les crèches",date:new Date().toISOString().slice(0,10),images:[],publie:false,emoji:"📣",bg:"#E8F4F8",menu_semaine:""};
+    renderPostEditor(editingPost);
+  };
+  window.apEditPost = function(id) {
+    editingPost = adminPosts.find(p=>p.id===id);
+    if(editingPost) renderPostEditor(editingPost);
+  };
+  window.apSavePost = function() {
+    const tog = document.getElementById("ed-publie-toggle");
+    const type = document.getElementById("ed-type").value;
+    const BG = {evenement:"#FDF0EC",sortie:"#EDF4ED",menu:"#FFF9E6",photo:"#F3EFFA",actu:"#E8F4F8"};
+    const EM = {evenement:"🎉",sortie:"🌳",menu:"🍽️",photo:"🎨",actu:"📣"};
+    const updated = {
+      ...editingPost,
+      type, titre:document.getElementById("ed-titre").value,
+      contenu:document.getElementById("ed-contenu").value,
+      creche:document.getElementById("ed-creche").value,
+      date:document.getElementById("ed-date").value,
+      publie:tog.classList.contains("on"),
+      menu_semaine:document.getElementById("ed-menu")?.value||"",
+      bg:BG[type]||"#E8F4F8", emoji:EM[type]||"📣",
+    };
+    const idx = adminPosts.findIndex(p=>p.id===updated.id);
+    if(idx>=0) adminPosts[idx]=updated; else adminPosts.unshift(updated);
+    editingPost=null;
+    apCancelEdit();
+    toast("✓ Publication enregistrée");
+  };
+  window.apCancelEdit = function() {
+    document.getElementById("ap-post-editor").style.display="none";
+    document.getElementById("ap-posts-list").style.display="block";
+    editingPost=null;
+    renderPostsList();
+  };
+  window.apTogglePost = function(id) {
+    const p=adminPosts.find(x=>x.id===id);
+    if(p){p.publie=!p.publie;renderPostsList();toast(p.publie?"✓ Publié":"Dépublié")}
+  };
+  window.apDeletePost = function(id) {
+    if(!confirm("Supprimer cette publication ?")) return;
+    adminPosts=adminPosts.filter(p=>p.id!==id);
+    renderPostsList(); toast("🗑 Supprimé");
+  };
+
+  // ── CRÈCHES ──
+  function renderCreches() {
+    const el = document.getElementById("ap-creches-list");
+    el.innerHTML = adminCreches.map((c,i)=>`
+    <div class="ap-card">
+      <div class="ap-card-head">🏠 ${c.nom}</div>
+      <div class="ap-card-body">
+        <div class="ap-2col">
+          <div class="ap-field"><label>Nom</label><input type="text" id="c-nom-${i}" value="${c.nom}"></div>
+          <div class="ap-field"><label>Places</label><input type="text" id="c-places-${i}" value="${c.places}"></div>
+        </div>
+        <div class="ap-field"><label>Adresse</label><input type="text" id="c-addr-${i}" value="${c.adresse}"></div>
+        <div class="ap-2col">
+          <div class="ap-field"><label>Téléphone</label><input type="tel" id="c-tel-${i}" value="${c.tel}"></div>
+          <div class="ap-field"><label>Email</label><input type="email" id="c-email-${i}" value="${c.email}"></div>
+        </div>
+        <div class="ap-field"><label>Horaires</label><input type="text" id="c-hours-${i}" value="${c.horaires}"></div>
+      </div>
+    </div>`).join("");
+  }
+
+  function collectCreches() {
+    return adminCreches.map((_,i)=>({
+      nom:document.getElementById(`c-nom-${i}`)?.value||"",
+      adresse:document.getElementById(`c-addr-${i}`)?.value||"",
+      tel:document.getElementById(`c-tel-${i}`)?.value||"",
+      email:document.getElementById(`c-email-${i}`)?.value||"",
+      horaires:document.getElementById(`c-hours-${i}`)?.value||"",
+      places:document.getElementById(`c-places-${i}`)?.value||"",
+    }));
+  }
+
+  // ── SAVE ──
+  window.adminSave = function() {
+    const newCreches = collectCreches();
+    const newContact = {
+      adresse:document.getElementById("ap-ct-addr")?.value||contact.adresse,
+      tel:document.getElementById("ap-ct-tel")?.value||contact.tel,
+      email:document.getElementById("ap-ct-email")?.value||contact.email,
+      horaires:document.getElementById("ap-ct-hours")?.value||contact.horaires,
+    };
+    const payload = { creches:newCreches, posts:adminPosts, contact:newContact };
+    saveData(payload);
+    // Mettre à jour le blog en direct
+    POSTS = adminPosts.filter(p=>p.publie);
+    updateCounts(); renderBlog();
+    toast("✓ Sauvegardé ! Le site est mis à jour.");
+    document.getElementById("ap-save-btn").textContent="✓ Sauvegardé";
+    setTimeout(()=>document.getElementById("ap-save-btn").textContent="💾 Sauvegarder",2000);
+  };
+
+  // ── EXPORT / IMPORT ──
+  window.adminExport = function() {
+    const d={creches:collectCreches(),posts:adminPosts,contact:{adresse:document.getElementById("ap-ct-addr")?.value,tel:document.getElementById("ap-ct-tel")?.value,email:document.getElementById("ap-ct-email")?.value,horaires:document.getElementById("ap-ct-hours")?.value}};
+    const blob=new Blob([JSON.stringify(d,null,2)],{type:"application/json"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="pitchoun-data.json";a.click();
+    toast("⬇ Export téléchargé");
+  };
+  window.adminImport = function(e) {
+    const file=e.target.files[0]; if(!file) return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const d=JSON.parse(ev.target.result);
+        if(d.posts) adminPosts=d.posts;
+        if(d.creches) { adminCreches=d.creches; renderCreches(); }
+        if(d.contact){document.getElementById("ap-ct-addr").value=d.contact.adresse||"";document.getElementById("ap-ct-tel").value=d.contact.tel||"";document.getElementById("ap-ct-email").value=d.contact.email||"";document.getElementById("ap-ct-hours").value=d.contact.horaires||"";}
+        renderPostsList();
+        toast("⬆ Import réussi !");
+      }catch(err){toast("❌ Fichier invalide");}
+    };
+    r.readAsText(file);
+  };
+
+  // ── FERMER ──
+  window.adminClose = function() {
+    root.remove();
+    history.replaceState(null,"",window.location.pathname);
+  };
+
+  // Init
+  renderPostsList();
+}
+
+// Charger les données localStorage au démarrage du blog
+async function loadAdmin(){
+  try{
+    const local = localStorage.getItem(LS_KEY);
+    if(local){
+      const d=JSON.parse(local);
+      if(d.posts&&d.posts.length){POSTS=d.posts.filter(p=>p.publie);return;}
+    }
+  }catch(e){}
+  POSTS=DEMO;
+}
+
+
+// ══ EMAILJS ══
+(function(){
+  emailjs.init({ publicKey: "4rTd-6Umb_bcuIpRZ" });
+})();
+
+window.sendEmail = function() {
+  const btn = document.getElementById("contact-submit");
+  const msg = document.getElementById("contact-msg");
+  const prenom = document.querySelector('#page-site input[placeholder="Marie"]')?.value || "";
+  const nom = document.querySelector('#page-site input[placeholder="Dupont"]')?.value || "";
+  const email = document.querySelector('#page-site input[type="email"]')?.value || "";
+  const sujet = document.querySelector('#page-site select')?.value || "";
+  const message = document.querySelector('#page-site textarea')?.value || "";
+
+  if (!prenom || !email || !message) {
+    msg.style.display = "block";
+    msg.style.color = "#842029";
+    msg.style.background = "#f8d7da";
+    msg.style.padding = ".6rem .9rem";
+    msg.style.borderRadius = ".6rem";
+    msg.textContent = "Merci de remplir au moins votre prénom, email et message.";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Envoi en cours…";
+
+  emailjs.send("pitchoun", "template_v4q1q5h", {
+    from_name: prenom + " " + nom,
+    from_email: email,
+    subject: sujet,
+    message: message,
+  }).then(() => {
+    msg.style.display = "block";
+    msg.style.color = "#276230";
+    msg.style.background = "#d4edda";
+    msg.style.padding = ".6rem .9rem";
+    msg.style.borderRadius = ".6rem";
+    msg.textContent = "✓ Message envoyé ! Nous vous répondrons dans les plus brefs délais.";
+    btn.textContent = "✓ Envoyé !";
+    // Vider les champs
+    document.querySelector('#page-site input[placeholder="Marie"]').value = "";
+    document.querySelector('#page-site input[placeholder="Dupont"]').value = "";
+    document.querySelector('#page-site input[type="email"]').value = "";
+    document.querySelector('#page-site textarea').value = "";
+  }).catch((err) => {
+    msg.style.display = "block";
+    msg.style.color = "#842029";
+    msg.style.background = "#f8d7da";
+    msg.style.padding = ".6rem .9rem";
+    msg.style.borderRadius = ".6rem";
+    msg.textContent = "❌ Erreur lors de l'envoi. Veuillez réessayer.";
+    btn.disabled = false;
+    btn.textContent = "Envoyer le message →";
+    console.error(err);
+  });
+};
+
+(async()=>{await loadAdmin();updateCounts();renderBlog();checkAdminHash();})();
+</script>
+</body>
+</html>
