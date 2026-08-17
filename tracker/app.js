@@ -130,7 +130,11 @@
 
   function openModal(html, onMount) {
     var root = document.getElementById('modal-root');
-    root.innerHTML = '<div class="modal-overlay" data-action="modal-close"><div class="modal-box" role="dialog" aria-modal="true">' + html + '</div></div>';
+    // L'overlay utilise un data-action distinct de "modal-close" pour ne pas
+    // entrer en collision avec les boutons Annuler/Fermer du contenu (sinon
+    // root.querySelector('[data-action="modal-close"]') attrape l'overlay
+    // en premier au lieu du bouton, qui ne fait alors plus rien au clic).
+    root.innerHTML = '<div class="modal-overlay" data-action="modal-overlay-close"><div class="modal-box" role="dialog" aria-modal="true">' + html + '</div></div>';
     root.querySelector('.modal-box').addEventListener('click', function (e) { e.stopPropagation(); });
     root.querySelector('.modal-overlay').addEventListener('click', closeModal);
     if (onMount) onMount(root);
@@ -241,7 +245,7 @@
       if (names.length) srcLabel = 'Source' + (names.length > 1 ? 's' : '') + ' : ' + names.join(', ');
     }
     var numDisplay = stepsRuntime.loading ? '…' : (steps != null ? steps.toLocaleString('fr-FR') : '—');
-    var errorLine = stepsRuntime.error ? '<div class="steps-src" style="color:var(--coral-dk)">' + escapeHtml(stepsRuntime.error) + '</div>' : '';
+    var errorLine = stepsRuntime.error ? '<div class="steps-src" style="font-weight:700">⚠ ' + escapeHtml(stepsRuntime.error) + '</div>' : '';
     return '<div class="steps-card">' +
       '<div class="steps-icon">👟</div>' +
       '<div class="steps-main">' +
@@ -367,7 +371,7 @@
         }
       })
       .catch(function (e) {
-        container.innerHTML = '<p class="hint" style="color:var(--coral-dk)">Impossible de charger le statut des connexions (' + escapeHtml(e.message) + ').</p>';
+        container.innerHTML = '<p class="hint" style="font-weight:700">⚠ Impossible de charger le statut des connexions (' + escapeHtml(e.message) + ').</p>';
       });
   }
 
