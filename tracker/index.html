@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0"/>
+<title>Suivi Sportif & Habitudes</title>
+<meta name="description" content="Suivi hebdomadaire d'habitudes et de séances d'entraînement, installable et utilisable hors-ligne."/>
+<meta name="theme-color" content="#4A7048"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" href="icons/icon-192.png"/>
+<link rel="apple-touch-icon" href="icons/icon-192.png"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Suivi Sport"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="topbar-title">Suivi <span>Sportif</span></span>
+</header>
+
+<main id="app" class="app">
+  <!-- panels are rendered by app.js -->
+  <section id="panel-habitudes" class="panel" hidden></section>
+  <section id="panel-seances" class="panel" hidden></section>
+</main>
+
+<div id="modal-root"></div>
+<div id="toast" class="toast" hidden></div>
+
+<nav class="tabbar" aria-label="Navigation principale">
+  <button class="tab-btn" data-tab="habitudes" type="button">
+    <svg viewBox="0 0 24 24" class="tab-icon"><path d="M4 12l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Habitudes</span>
+  </button>
+  <button class="tab-btn" data-tab="seances" type="button">
+    <svg viewBox="0 0 24 24" class="tab-icon"><path d="M6 4v16M18 4v16M2 9h4M18 9h4M2 15h4M18 15h4M6 12h12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Séances</span>
+  </button>
+</nav>
+
+<script src="app.js"></script>
+</body>
+</html>
