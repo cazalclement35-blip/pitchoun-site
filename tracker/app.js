@@ -65,8 +65,13 @@
       weeks: [week1],
       activeWeek: 0,
       seances: seances,
-      activeSeance: 0
+      activeSeance: 0,
+      integration: defaultIntegration()
     };
+  }
+
+  function defaultIntegration() {
+    return { backendUrl: '', passcode: '', stepsHabitId: null, stepsGoal: 7000, autoTick: true };
   }
 
   function load() {
@@ -75,6 +80,7 @@
       if (raw) {
         var parsed = JSON.parse(raw);
         if (parsed && Array.isArray(parsed.habits) && Array.isArray(parsed.weeks) && Array.isArray(parsed.seances)) {
+          if (!parsed.integration) parsed.integration = defaultIntegration();
           return parsed;
         }
       }
@@ -96,6 +102,19 @@
     return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
+  }
+
+  function localDateStr(d) {
+    d = d || new Date();
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
+
+  function todayWeekdayIndex() {
+    // JS getDay(): Dimanche=0..Samedi=6 -> on veut Lundi=0..Dimanche=6
+    return (new Date().getDay() + 6) % 7;
   }
 
   var toastTimer = null;
@@ -145,6 +164,213 @@
     if (state.activeTab === 'habitudes') renderHabitudes(); else renderSeances();
   }
 
+  // ═══════════════════════ MONTRES CONNECTÉES (PAS) ═══════════════════════
+  // Le suivi des pas dépend d'un backend externe (Cloudflare Worker) que
+  // l'utilisateur déploie et configure lui-même (URL + mot de passe). Sans
+  // configuration, cette partie reste silencieuse et l'app fonctionne comme
+  // avant, 100% locale.
+
+  var stepsRuntime = { loading: false, error: null, data: null };
+
+  function backendConfigured() {
+    return !!(state.integration.backendUrl && state.integration.passcode);
+  }
+
+  function backendFetch(path, opts) {
+    opts = opts || {};
+    var base = state.integration.backendUrl.replace(/\/+$/, '');
+    var headers = Object.assign({ 'X-App-Passcode': state.integration.passcode }, opts.headers || {});
+    return fetch(base + path, Object.assign({}, opts, { headers: headers }));
+  }
+
+  function refreshStepsWidgetIfVisible() {
+    if (state.activeTab === 'habitudes') renderHabitudes();
+  }
+
+  function applyAutoTick(steps) {
+    if (steps == null) return;
+    var integ = state.integration;
+    if (!integ.autoTick || !integ.stepsHabitId) return;
+    if (steps < (integ.stepsGoal || 7000)) return;
+    if (!state.habits.some(function (h) { return h.id === integ.stepsHabitId; })) return;
+    var week = state.weeks[state.weeks.length - 1];
+    if (!week) return;
+    if (!week.checks[integ.stepsHabitId]) week.checks[integ.stepsHabitId] = emptyWeekChecks();
+    var idx = todayWeekdayIndex();
+    if (!week.checks[integ.stepsHabitId][idx]) {
+      week.checks[integ.stepsHabitId][idx] = true;
+      persist();
+    }
+  }
+
+  function syncSteps(silent) {
+    if (!backendConfigured()) return Promise.resolve();
+    stepsRuntime.loading = true;
+    if (!silent) refreshStepsWidgetIfVisible();
+    return backendFetch('/api/steps?date=' + localDateStr())
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        stepsRuntime.data = data;
+        stepsRuntime.error = null;
+        applyAutoTick(data.best);
+      })
+      .catch(function (e) {
+        stepsRuntime.error = e.message || 'Erreur de synchronisation';
+      })
+      .finally(function () {
+        stepsRuntime.loading = false;
+        refreshStepsWidgetIfVisible();
+      });
+  }
+
+  function stepsWidgetHtml() {
+    if (!backendConfigured()) {
+      return '<div class="steps-connect-hint"><span>⌚ Connecte une montre pour suivre tes pas automatiquement</span>' +
+        '<button class="btn btn-sun btn-sm" data-action="open-connexions">Connecter</button></div>';
+    }
+    var d = stepsRuntime.data;
+    var steps = d ? d.best : null;
+    var goal = state.integration.stepsGoal || 7000;
+    var pct = steps != null ? Math.min(100, Math.round(steps / goal * 100)) : 0;
+    var srcLabel = '';
+    if (d && d.sources) {
+      var names = Object.keys(d.sources).filter(function (k) { return typeof d.sources[k] === 'number'; });
+      if (names.length) srcLabel = 'Source' + (names.length > 1 ? 's' : '') + ' : ' + names.join(', ');
+    }
+    var numDisplay = stepsRuntime.loading ? '…' : (steps != null ? steps.toLocaleString('fr-FR') : '—');
+    var errorLine = stepsRuntime.error ? '<div class="steps-src" style="color:var(--coral-dk)">' + escapeHtml(stepsRuntime.error) + '</div>' : '';
+    return '<div class="steps-card">' +
+      '<div class="steps-icon">👟</div>' +
+      '<div class="steps-main">' +
+      '<div class="steps-num">' + numDisplay + ' <small>/ ' + goal.toLocaleString('fr-FR') + ' pas</small></div>' +
+      '<div class="steps-goal-bar"><div class="steps-goal-fill" style="width:' + pct + '%"></div></div>' +
+      (srcLabel ? '<div class="steps-src">' + escapeHtml(srcLabel) + '</div>' : '') +
+      errorLine +
+      '</div>' +
+      '<button class="btn btn-icon btn-ghost steps-sync-btn" data-action="steps-sync" aria-label="Synchroniser">' + (stepsRuntime.loading ? '⏳' : '↻') + '</button>' +
+      '</div>';
+  }
+
+  function providerRowHtml(pid, label, connected) {
+    return '<div class="provider-row">' +
+      '<span class="provider-dot ' + (connected ? 'on' : '') + '"></span>' +
+      '<span class="provider-name">' + escapeHtml(label) + '</span>' +
+      (connected
+        ? '<button class="btn btn-sm btn-danger" data-action="provider-disconnect" data-provider="' + pid + '">Déconnecter</button>'
+        : '<button class="btn btn-sm btn-primary" data-action="provider-connect" data-provider="' + pid + '">Connecter</button>') +
+      '</div>';
+  }
+
+  function openConnexionsModal() {
+    var integ = state.integration;
+    var habitOptions = '<option value="">— aucune —</option>' + state.habits.map(function (h) {
+      return '<option value="' + h.id + '" ' + (integ.stepsHabitId === h.id ? 'selected' : '') + '>' + escapeHtml(h.name) + '</option>';
+    }).join('');
+    var configured = backendConfigured();
+
+    var html = '<h3>⌚ Montres connectées</h3>' +
+      '<div class="settings-field"><label for="backend-url-input">URL du backend</label>' +
+      '<input type="text" id="backend-url-input" placeholder="https://....workers.dev" value="' + escapeHtml(integ.backendUrl) + '"/></div>' +
+      '<div class="settings-field"><label for="backend-passcode-input">Mot de passe</label>' +
+      '<input type="password" id="backend-passcode-input" value="' + escapeHtml(integ.passcode) + '"/></div>' +
+      '<button class="btn btn-primary btn-block" data-action="save-backend-settings">Enregistrer</button>' +
+      '<div id="providers-list" style="margin-top:1rem">' +
+      (configured ? '<p class="muted" style="text-align:center;padding:.5rem 0">Chargement…</p>' : '<p class="hint">Renseigne d\'abord l\'URL et le mot de passe de ton backend pour voir les connexions disponibles.</p>') +
+      '</div>' +
+      (configured ? (
+        '<div class="settings-field" style="margin-top:1rem"><label for="steps-habit-select">Habitude à cocher automatiquement</label>' +
+        '<select id="steps-habit-select">' + habitOptions + '</select></div>' +
+        '<div class="settings-field"><label for="steps-goal-input">Objectif de pas</label>' +
+        '<input type="number" id="steps-goal-input" min="0" step="500" value="' + (integ.stepsGoal || 7000) + '"/></div>' +
+        '<div class="modal-list-item"><input type="checkbox" id="steps-autotick-input" ' + (integ.autoTick ? 'checked' : '') + '/><label for="steps-autotick-input" style="flex:1">Cocher automatiquement quand l\'objectif est atteint</label></div>' +
+        '<button class="btn btn-primary btn-block" style="margin-top:.8rem" data-action="save-steps-settings">Enregistrer ces réglages</button>'
+      ) : '') +
+      '<div class="modal-actions" style="margin-top:1rem"><button class="btn btn-ghost" data-action="modal-close">Fermer</button></div>';
+
+    openModal(html, function (root) {
+      root.querySelector('[data-action="modal-close"]').addEventListener('click', closeModal);
+      root.querySelector('[data-action="save-backend-settings"]').addEventListener('click', function () {
+        integ.backendUrl = root.querySelector('#backend-url-input').value.trim();
+        integ.passcode = root.querySelector('#backend-passcode-input').value.trim();
+        persist();
+        closeModal();
+        openConnexionsModal();
+        syncSteps();
+      });
+      if (configured) {
+        var saveStepsBtn = root.querySelector('[data-action="save-steps-settings"]');
+        saveStepsBtn.addEventListener('click', function () {
+          integ.stepsHabitId = root.querySelector('#steps-habit-select').value || null;
+          integ.stepsGoal = Math.max(0, parseInt(root.querySelector('#steps-goal-input').value, 10) || 7000);
+          integ.autoTick = root.querySelector('#steps-autotick-input').checked;
+          persist();
+          closeModal();
+          toast('Réglages enregistrés');
+          syncSteps();
+        });
+        loadProvidersList(root);
+      }
+    });
+  }
+
+  function loadProvidersList(root) {
+    var container = root.querySelector('#providers-list');
+    backendFetch('/api/connections')
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        var html = '';
+        ['withings', 'polar', 'googlehealth'].forEach(function (pid) {
+          var p = data[pid] || { label: pid, connected: false };
+          html += providerRowHtml(pid, p.label, p.connected);
+        });
+        var appleConnected = data.apple && data.apple.connected;
+        var webhookUrl = state.integration.backendUrl.replace(/\/+$/, '') + '/webhook/apple?passcode=' + state.integration.passcode;
+        html += '<div class="provider-row"><span class="provider-dot ' + (appleConnected ? 'on' : '') + '"></span>' +
+          '<span class="provider-name">Apple Watch' +
+          '<div class="provider-sub">' + (appleConnected ? 'Dernière synchro : ' + (data.apple.lastSync ? new Date(data.apple.lastSync).toLocaleString('fr-FR') : '?') : "Via l'app Health Auto Export + Raccourcis") + '</div></span>' +
+          (appleConnected ? '<button class="btn btn-sm btn-danger" data-action="provider-disconnect" data-provider="apple">Oublier</button>' : '') +
+          '</div>' +
+          '<div class="webhook-url-box"><code id="webhook-url-code">' + escapeHtml(webhookUrl) + '</code>' +
+          '<button class="btn btn-sm" data-action="copy-webhook">Copier</button></div>' +
+          '<p class="hint">Colle cette URL dans Health Auto Export (ou Health Webhook), avec les pas exportés en cumul du jour (pas en delta), et une automatisation Raccourcis qui l\'envoie régulièrement.</p>';
+        container.innerHTML = html;
+
+        container.querySelectorAll('[data-action="provider-connect"]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var pid = btn.dataset.provider;
+            var url = state.integration.backendUrl.replace(/\/+$/, '') + '/auth/' + pid + '/start?passcode=' + encodeURIComponent(state.integration.passcode);
+            window.open(url, '_blank');
+          });
+        });
+        container.querySelectorAll('[data-action="provider-disconnect"]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var pid = btn.dataset.provider;
+            backendFetch('/api/disconnect/' + pid, { method: 'POST' })
+              .then(function () { toast('Déconnecté'); loadProvidersList(root); })
+              .catch(function (e) { toast('Erreur : ' + e.message); });
+          });
+        });
+        var copyBtn = container.querySelector('[data-action="copy-webhook"]');
+        if (copyBtn) {
+          copyBtn.addEventListener('click', function () {
+            var text = container.querySelector('#webhook-url-code').textContent;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(text).then(function () { toast('URL copiée'); }).catch(function () { toast('Impossible de copier'); });
+            }
+          });
+        }
+      })
+      .catch(function (e) {
+        container.innerHTML = '<p class="hint" style="color:var(--coral-dk)">Impossible de charger le statut des connexions (' + escapeHtml(e.message) + ').</p>';
+      });
+  }
+
   // ═══════════════════════ HABITUDES ═══════════════════════
 
   function pctClass(pct) {
@@ -161,6 +387,8 @@
     var panel = document.getElementById('panel-habitudes');
     var week = currentWeek();
     var html = '';
+
+    html += stepsWidgetHtml();
 
     html += '<div class="week-nav">' +
       '<button class="btn btn-icon btn-ghost" data-action="week-prev" ' + (state.activeWeek === 0 ? 'disabled' : '') + ' aria-label="Semaine précédente">‹</button>' +
@@ -321,6 +549,10 @@
       openHabitModal(null);
     } else if (action === 'habit-edit') {
       openHabitModal(btn.dataset.habit);
+    } else if (action === 'steps-sync') {
+      syncSteps();
+    } else if (action === 'open-connexions') {
+      openConnexionsModal();
     }
   }
 
@@ -500,7 +732,16 @@
     document.getElementById('panel-habitudes').addEventListener('change', onHabitudesChange);
     document.getElementById('panel-seances').addEventListener('click', onSeancesClick);
     document.getElementById('panel-seances').addEventListener('input', onSeancesInput);
+    document.querySelector('.topbar-settings').addEventListener('click', openConnexionsModal);
     render();
+
+    if (backendConfigured()) {
+      syncSteps(true);
+      setInterval(function () { if (backendConfigured()) syncSteps(true); }, 5 * 60 * 1000);
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden && backendConfigured()) syncSteps(true);
+      });
+    }
   }
 
   init();

@@ -1,0 +1,28 @@
+name = "suivi-sportif-backend"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+
+# Variables non secrètes. Modifie ALLOWED_ORIGIN pour pointer vers l'URL réelle
+# où l'app (dossier /tracker) est servie, ex: "https://tonpseudo.github.io".
+# APP_URL est la page vers laquelle on redirige l'utilisateur une fois une
+# connexion OAuth terminée (généralement la même URL + "/tracker/").
+[vars]
+ALLOWED_ORIGIN = "*"
+APP_URL = "https://cazalclement35-blip.github.io/pitchoun-site/tracker/"
+
+# Namespace KV utilisé pour stocker les tokens OAuth et les pas synchronisés.
+# Créer avec : wrangler kv namespace create TRACKER_KV
+# puis coller l'id retourné ci-dessous.
+[[kv_namespaces]]
+binding = "TRACKER_KV"
+id = "REMPLACE_MOI_AVEC_L_ID_KV"
+
+# Secrets à définir avec `wrangler secret put <NOM>` (jamais dans ce fichier) :
+#   APP_PASSCODE            -> mot de passe perso pour protéger l'API
+#   WITHINGS_CLIENT_ID
+#   WITHINGS_CLIENT_SECRET
+#   POLAR_CLIENT_ID
+#   POLAR_CLIENT_SECRET
+#   GOOGLEHEALTH_CLIENT_ID
+#   GOOGLEHEALTH_CLIENT_SECRET
+#   APPLE_WEBHOOK_SECRET     -> jeton utilisé comme ?passcode= dans l'URL du webhook

@@ -1,0 +1,14 @@
+{
+  "name": "suivi-sportif-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend Cloudflare Worker : connexions OAuth (Withings, Polar, Google Health/Fitbit) et webhook Apple Santé pour l'app Suivi Sportif",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
