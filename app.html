@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mon Espace — Organisation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,800;1,9..144,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sage:#8BAF8A;--sage-lt:#C8DEC7;--sage-dk:#4A7048;
+  --cream:#FAF6EF;--sun:#F2C063;--coral:#E8836A;--sky:#7BA8C4;
+  --ink:#1C2B1A;--muted:#6B7F6A;--white:#FFFFFF;
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'DM Sans',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--cream);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;min-height:100vh}
+
+header{
+  background:var(--white);border-bottom:1px solid var(--sage-lt);
+  position:sticky;top:0;z-index:100;
+}
+.header-inner{max-width:1100px;margin:0 auto;padding:1.1rem 1.5rem .9rem;}
+.header-title{font-family:var(--font-display);font-weight:800;font-size:1.6rem;color:var(--sage-dk);letter-spacing:-.02em;margin-bottom:.9rem}
+.header-title span{color:var(--coral)}
+.tabs{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.2rem}
+.tab-btn{
+  flex-shrink:0;background:none;border:none;cursor:pointer;
+  font-family:var(--font-body);font-weight:600;font-size:.92rem;color:var(--muted);
+  padding:.6rem 1.1rem;border-radius:100px;transition:background .15s,color .15s;
+  display:flex;align-items:center;gap:.45rem;
+}
+.tab-btn:hover{background:var(--cream)}
+.tab-btn.active{background:var(--sage-dk);color:var(--white)}
+
+main{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 4rem}
+.panel{display:none}
+.panel.active{display:block;animation:fadein .25s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.panel-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:1.3rem}
+.panel-head h2{font-family:var(--font-display);font-weight:700;font-size:1.5rem}
+.panel-sub{color:var(--muted);font-size:.9rem}
+
+.card{background:var(--white);border:1px solid var(--sage-lt);border-radius:16px;padding:1.3rem;margin-bottom:1.1rem}
+
+/* ---- Forms ---- */
+.form-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.2rem}
+input[type=text],input[type=date],input[type=number],input[type=time],select,textarea{
+  font-family:var(--font-body);font-size:.92rem;padding:.7rem .9rem;
+  border:1.5px solid var(--sage-lt);border-radius:10px;background:var(--cream);color:var(--ink);
+  flex:1 1 140px;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--sage-dk)}
+.btn{
+  font-family:var(--font-body);font-weight:600;font-size:.9rem;cursor:pointer;
+  background:var(--sage-dk);color:var(--white);border:none;border-radius:10px;
+  padding:.7rem 1.3rem;transition:background .15s,transform .1s;white-space:nowrap;
+}
+.btn:hover{background:var(--ink)}
+.btn:active{transform:scale(.97)}
+.btn-outline{background:transparent;color:var(--sage-dk);border:1.5px solid var(--sage-dk)}
+.btn-outline:hover{background:var(--sage-lt);color:var(--ink)}
+.btn-icon{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.05rem;padding:.3rem .5rem;border-radius:8px;transition:background .15s,color .15s}
+.btn-icon:hover{background:#fbeae4;color:var(--coral)}
+
+/* ---- To-do ---- */
+.todo-filters{display:flex;gap:.4rem;margin-bottom:1rem}
+.chip{background:var(--cream);border:1.5px solid var(--sage-lt);color:var(--muted);font-size:.82rem;font-weight:600;padding:.4rem .9rem;border-radius:100px;cursor:pointer}
+.chip.active{background:var(--sage-dk);border-color:var(--sage-dk);color:var(--white)}
+.todo-item{display:flex;align-items:center;gap:.8rem;padding:.75rem .3rem;border-bottom:1px solid var(--sage-lt)}
+.todo-item:last-child{border-bottom:none}
+.todo-check{width:22px;height:22px;border:2px solid var(--sage);border-radius:7px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:var(--white);transition:background .15s,border-color .15s}
+.todo-check.done{background:var(--sage-dk);border-color:var(--sage-dk);color:var(--white)}
+.todo-text{flex:1;font-size:.95rem}
+.todo-text.done{color:var(--muted);text-decoration:line-through}
+.todo-prio{font-size:.72rem;font-weight:700;padding:.2rem .55rem;border-radius:100px;flex-shrink:0}
+.prio-haute{background:#fbeae4;color:var(--coral)}
+.prio-normale{background:#eef3ed;color:var(--sage-dk)}
+.prio-basse{background:#eef2f6;color:var(--sky)}
+.empty{color:var(--muted);font-size:.9rem;text-align:center;padding:2rem 0}
+
+/* ---- Planning ---- */
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.8rem}
+@media (max-width:900px){.week-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
+.day-col{background:var(--white);border:1px solid var(--sage-lt);border-radius:14px;padding:.9rem;min-height:120px}
+.day-col h3{font-family:var(--font-display);font-size:.98rem;color:var(--sage-dk);margin-bottom:.7rem;text-transform:capitalize}
+.event-item{background:var(--cream);border-left:3px solid var(--sun);border-radius:6px;padding:.45rem .6rem;margin-bottom:.5rem;font-size:.82rem;position:relative}
+.event-time{font-weight:700;color:var(--sage-dk);display:block}
+.event-del{position:absolute;top:.3rem;right:.4rem;background:none;border:none;cursor:pointer;color:var(--muted);font-size:.8rem;opacity:.6}
+.event-del:hover{opacity:1;color:var(--coral)}
+
+/* ---- Sport ---- */
+.sport-session{background:var(--white);border:1px solid var(--sage-lt);border-radius:16px;padding:1.2rem;margin-bottom:1rem}
+.sport-session-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem}
+.sport-session-head h3{font-family:var(--font-display);font-size:1.1rem;color:var(--ink)}
+.sport-session-head .tag{font-size:.75rem;background:#eef3ed;color:var(--sage-dk);padding:.25rem .65rem;border-radius:100px;font-weight:600}
+.exo-row{display:flex;align-items:center;gap:.7rem;padding:.5rem 0;border-bottom:1px dashed var(--sage-lt)}
+.exo-row:last-of-type{border-bottom:none}
+.exo-check{width:20px;height:20px;border:2px solid var(--sage);border-radius:6px;flex-shrink:0;cursor:pointer;background:var(--white)}
+.exo-check.done{background:var(--sage-dk);border-color:var(--sage-dk)}
+.exo-name{flex:1;font-size:.92rem}
+.exo-name.done{color:var(--muted);text-decoration:line-through}
+.exo-meta{font-size:.8rem;color:var(--muted);flex-shrink:0}
+.exo-add-row{display:flex;gap:.5rem;margin-top:.7rem}
+.exo-add-row input{padding:.5rem .7rem;font-size:.85rem}
+
+/* ---- Objectifs ---- */
+.goal-card{background:var(--white);border:1px solid var(--sage-lt);border-radius:16px;padding:1.2rem;margin-bottom:1rem}
+.goal-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;margin-bottom:.6rem}
+.goal-title{font-family:var(--font-display);font-weight:700;font-size:1.08rem}
+.goal-cat{font-size:.72rem;font-weight:700;padding:.2rem .6rem;border-radius:100px;background:#fef4e3;color:#b5822b;white-space:nowrap}
+.goal-deadline{font-size:.8rem;color:var(--muted);margin-bottom:.7rem}
+.progress-bar{background:var(--sage-lt);border-radius:100px;height:10px;overflow:hidden;margin-bottom:.5rem}
+.progress-fill{background:linear-gradient(90deg,var(--sage),var(--sage-dk));height:100%;border-radius:100px;transition:width .3s}
+.progress-row{display:flex;align-items:center;gap:.7rem}
+.progress-row input[type=range]{flex:1;accent-color:var(--sage-dk)}
+.progress-val{font-weight:700;color:var(--sage-dk);font-size:.9rem;width:42px;text-align:right}
+
+.actions-row{display:flex;justify-content:flex-end;gap:.4rem;margin-top:.6rem}
+footer{text-align:center;color:var(--muted);font-size:.8rem;padding:2rem 0}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-title">Mon <span>Espace</span></div>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="todo" onclick="switchTab('todo')">✅ Tâches</button>
+      <button class="tab-btn" data-tab="planning" onclick="switchTab('planning')">🗓️ Emploi du temps</button>
+      <button class="tab-btn" data-tab="sport" onclick="switchTab('sport')">💪 Sport</button>
+      <button class="tab-btn" data-tab="goals" onclick="switchTab('goals')">🎯 Objectifs</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== TO-DO ===== -->
+  <section class="panel active" id="panel-todo">
+    <div class="panel-head">
+      <h2>Liste de tâches</h2>
+      <span class="panel-sub" id="todo-count"></span>
+    </div>
+    <div class="card">
+      <div class="form-row">
+        <input type="text" id="todo-input" placeholder="Nouvelle tâche…" onkeydown="if(event.key==='Enter')addTodo()"/>
+        <select id="todo-prio">
+          <option value="normale">Priorité normale</option>
+          <option value="haute">Priorité haute</option>
+          <option value="basse">Priorité basse</option>
+        </select>
+        <button class="btn" onclick="addTodo()">Ajouter</button>
+      </div>
+      <div class="todo-filters">
+        <button class="chip active" data-filter="all" onclick="setTodoFilter('all')">Toutes</button>
+        <button class="chip" data-filter="open" onclick="setTodoFilter('open')">En cours</button>
+        <button class="chip" data-filter="done" onclick="setTodoFilter('done')">Terminées</button>
+      </div>
+      <div id="todo-list"></div>
+    </div>
+  </section>
+
+  <!-- ===== PLANNING ===== -->
+  <section class="panel" id="panel-planning">
+    <div class="panel-head">
+      <h2>Emploi du temps</h2>
+      <span class="panel-sub">Ta semaine, organisée</span>
+    </div>
+    <div class="card">
+      <div class="form-row">
+        <select id="ev-day">
+          <option value="0">Lundi</option>
+          <option value="1">Mardi</option>
+          <option value="2">Mercredi</option>
+          <option value="3">Jeudi</option>
+          <option value="4">Vendredi</option>
+          <option value="5">Samedi</option>
+          <option value="6">Dimanche</option>
+        </select>
+        <input type="time" id="ev-time" value="09:00" style="flex:0 0 120px"/>
+        <input type="text" id="ev-title" placeholder="Intitulé (ex : Réunion, Cours...)"/>
+        <button class="btn" onclick="addEvent()">Ajouter</button>
+      </div>
+    </div>
+    <div class="week-grid" id="week-grid"></div>
+  </section>
+
+  <!-- ===== SPORT ===== -->
+  <section class="panel" id="panel-sport">
+    <div class="panel-head">
+      <h2>Programme de sport</h2>
+      <span class="panel-sub">Tes séances de la semaine</span>
+    </div>
+    <div class="card">
+      <div class="form-row">
+        <input type="text" id="session-name" placeholder="Nom de la séance (ex : Jour 1 — Haut du corps)"/>
+        <select id="session-day">
+          <option value="">Jour libre</option>
+          <option value="0">Lundi</option>
+          <option value="1">Mardi</option>
+          <option value="2">Mercredi</option>
+          <option value="3">Jeudi</option>
+          <option value="4">Vendredi</option>
+          <option value="5">Samedi</option>
+          <option value="6">Dimanche</option>
+        </select>
+        <button class="btn" onclick="addSession()">Créer la séance</button>
+      </div>
+    </div>
+    <div id="sport-list"></div>
+  </section>
+
+  <!-- ===== OBJECTIFS ===== -->
+  <section class="panel" id="panel-goals">
+    <div class="panel-head">
+      <h2>Objectifs</h2>
+      <span class="panel-sub">Suis ta progression</span>
+    </div>
+    <div class="card">
+      <div class="form-row">
+        <input type="text" id="goal-title" placeholder="Nouvel objectif…"/>
+        <input type="text" id="goal-cat" placeholder="Catégorie (ex : Sport, Travail...)" style="flex:0 0 180px"/>
+        <input type="date" id="goal-deadline" style="flex:0 0 160px"/>
+        <button class="btn" onclick="addGoal()">Ajouter</button>
+      </div>
+    </div>
+    <div id="goals-list"></div>
+  </section>
+
+</main>
+
+<footer>Toutes les données sont enregistrées uniquement sur cet appareil.</footer>
+
+<script>
+const DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const STORE_KEY = 'monEspaceData';
+
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return {todos:[], events:[], sessions:[], goals:[]};
+}
+let data = loadData();
+function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+/* ===== TABS ===== */
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+/* ===== TODO ===== */
+let todoFilter = 'all';
+function setTodoFilter(f){
+  todoFilter = f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active', c.dataset.filter===f));
+  renderTodos();
+}
+function addTodo(){
+  const input = document.getElementById('todo-input');
+  const text = input.value.trim();
+  if(!text) return;
+  const prio = document.getElementById('todo-prio').value;
+  data.todos.unshift({id:uid(), text, done:false, prio});
+  input.value = '';
+  save(); renderTodos();
+}
+function toggleTodo(id){
+  const t = data.todos.find(t=>t.id===id);
+  if(t){ t.done = !t.done; save(); renderTodos(); }
+}
+function deleteTodo(id){
+  data.todos = data.todos.filter(t=>t.id!==id);
+  save(); renderTodos();
+}
+function renderTodos(){
+  const list = document.getElementById('todo-list');
+  let items = data.todos;
+  if(todoFilter==='open') items = items.filter(t=>!t.done);
+  if(todoFilter==='done') items = items.filter(t=>t.done);
+  if(items.length===0){
+    list.innerHTML = '<div class="empty">Aucune tâche ici pour le moment.</div>';
+  } else {
+    list.innerHTML = items.map(t=>`
+      <div class="todo-item">
+        <div class="todo-check ${t.done?'done':''}" onclick="toggleTodo('${t.id}')">${t.done?'✓':''}</div>
+        <div class="todo-text ${t.done?'done':''}">${escapeHtml(t.text)}</div>
+        <span class="todo-prio prio-${t.prio}">${t.prio}</span>
+        <button class="btn-icon" onclick="deleteTodo('${t.id}')">✕</button>
+      </div>`).join('');
+  }
+  const remaining = data.todos.filter(t=>!t.done).length;
+  document.getElementById('todo-count').textContent = remaining + ' tâche' + (remaining>1?'s':'') + ' restante' + (remaining>1?'s':'');
+}
+
+/* ===== PLANNING ===== */
+function addEvent(){
+  const day = document.getElementById('ev-day').value;
+  const time = document.getElementById('ev-time').value;
+  const title = document.getElementById('ev-title').value.trim();
+  if(!title) return;
+  data.events.push({id:uid(), day:Number(day), time, title});
+  document.getElementById('ev-title').value = '';
+  save(); renderPlanning();
+}
+function deleteEvent(id){
+  data.events = data.events.filter(e=>e.id!==id);
+  save(); renderPlanning();
+}
+function renderPlanning(){
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = DAYS.map((d,i)=>{
+    const evs = data.events.filter(e=>e.day===i).sort((a,b)=>a.time.localeCompare(b.time));
+    return `<div class="day-col">
+      <h3>${d}</h3>
+      ${evs.length ? evs.map(e=>`
+        <div class="event-item">
+          <button class="event-del" onclick="deleteEvent('${e.id}')">✕</button>
+          <span class="event-time">${e.time}</span>${escapeHtml(e.title)}
+        </div>`).join('') : '<div class="empty" style="padding:.5rem 0;font-size:.8rem">Rien de prévu</div>'}
+    </div>`;
+  }).join('');
+}
+
+/* ===== SPORT ===== */
+function addSession(){
+  const name = document.getElementById('session-name').value.trim();
+  if(!name) return;
+  const dayVal = document.getElementById('session-day').value;
+  data.sessions.push({id:uid(), name, day: dayVal===''?null:Number(dayVal), exercises:[]});
+  document.getElementById('session-name').value = '';
+  save(); renderSport();
+}
+function deleteSession(id){
+  data.sessions = data.sessions.filter(s=>s.id!==id);
+  save(); renderSport();
+}
+function addExercise(sessionId){
+  const nameInput = document.getElementById('exo-name-'+sessionId);
+  const setsInput = document.getElementById('exo-sets-'+sessionId);
+  const name = nameInput.value.trim();
+  if(!name) return;
+  const sets = setsInput.value.trim();
+  const session = data.sessions.find(s=>s.id===sessionId);
+  session.exercises.push({id:uid(), name, sets, done:false});
+  nameInput.value=''; setsInput.value='';
+  save(); renderSport();
+}
+function toggleExercise(sessionId, exoId){
+  const session = data.sessions.find(s=>s.id===sessionId);
+  const exo = session.exercises.find(e=>e.id===exoId);
+  exo.done = !exo.done;
+  save(); renderSport();
+}
+function deleteExercise(sessionId, exoId){
+  const session = data.sessions.find(s=>s.id===sessionId);
+  session.exercises = session.exercises.filter(e=>e.id!==exoId);
+  save(); renderSport();
+}
+function renderSport(){
+  const list = document.getElementById('sport-list');
+  if(data.sessions.length===0){
+    list.innerHTML = '<div class="empty">Aucune séance créée pour l\\'instant.</div>';
+    return;
+  }
+  list.innerHTML = data.sessions.map(s=>`
+    <div class="sport-session">
+      <div class="sport-session-head">
+        <h3>${escapeHtml(s.name)}</h3>
+        <div style="display:flex;align-items:center;gap:.6rem">
+          ${s.day!==null ? `<span class="tag">${DAYS[s.day]}</span>` : ''}
+          <button class="btn-icon" onclick="deleteSession('${s.id}')">✕</button>
+        </div>
+      </div>
+      ${s.exercises.length ? s.exercises.map(e=>`
+        <div class="exo-row">
+          <div class="exo-check ${e.done?'done':''}" onclick="toggleExercise('${s.id}','${e.id}')"></div>
+          <div class="exo-name ${e.done?'done':''}">${escapeHtml(e.name)}</div>
+          <div class="exo-meta">${escapeHtml(e.sets||'')}</div>
+          <button class="btn-icon" onclick="deleteExercise('${s.id}','${e.id}')">✕</button>
+        </div>`).join('') : '<div class="empty" style="padding:.6rem 0;font-size:.85rem">Aucun exercice</div>'}
+      <div class="exo-add-row">
+        <input type="text" id="exo-name-${s.id}" placeholder="Exercice (ex : Squats)"/>
+        <input type="text" id="exo-sets-${s.id}" placeholder="Séries x reps" style="flex:0 0 120px"/>
+        <button class="btn btn-outline" onclick="addExercise('${s.id}')">+ Ajouter</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ===== GOALS ===== */
+function addGoal(){
+  const title = document.getElementById('goal-title').value.trim();
+  if(!title) return;
+  const cat = document.getElementById('goal-cat').value.trim() || 'Général';
+  const deadline = document.getElementById('goal-deadline').value;
+  data.goals.push({id:uid(), title, cat, deadline, progress:0});
+  document.getElementById('goal-title').value = '';
+  document.getElementById('goal-cat').value = '';
+  document.getElementById('goal-deadline').value = '';
+  save(); renderGoals();
+}
+function updateGoalProgress(id, val){
+  const g = data.goals.find(g=>g.id===id);
+  g.progress = Number(val);
+  save(); renderGoals();
+}
+function deleteGoal(id){
+  data.goals = data.goals.filter(g=>g.id!==id);
+  save(); renderGoals();
+}
+function renderGoals(){
+  const list = document.getElementById('goals-list');
+  if(data.goals.length===0){
+    list.innerHTML = '<div class="empty">Aucun objectif pour le moment.</div>';
+    return;
+  }
+  list.innerHTML = data.goals.map(g=>`
+    <div class="goal-card">
+      <div class="goal-top">
+        <div class="goal-title">${escapeHtml(g.title)}</div>
+        <span class="goal-cat">${escapeHtml(g.cat)}</span>
+      </div>
+      ${g.deadline ? `<div class="goal-deadline">Échéance : ${formatDate(g.deadline)}</div>` : ''}
+      <div class="progress-bar"><div class="progress-fill" style="width:${g.progress}%"></div></div>
+      <div class="progress-row">
+        <input type="range" min="0" max="100" step="5" value="${g.progress}" oninput="updateGoalProgress('${g.id}', this.value)"/>
+        <span class="progress-val">${g.progress}%</span>
+      </div>
+      <div class="actions-row">
+        <button class="btn-icon" onclick="deleteGoal('${g.id}')">✕ Supprimer</button>
+      </div>
+    </div>`).join('');
+}
+
+function formatDate(iso){
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* init */
+renderTodos();
+renderPlanning();
+renderSport();
+renderGoals();
+</script>
+</body>
+</html>
